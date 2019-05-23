@@ -24,6 +24,29 @@ PATH_OUT = 'data/RNA_seq/output/'
 
 print(RNAIDs)
 
+def normalize_counts(counts):
+    """Normalizes expression counts using DESeq's median-of-ratios approach."""
+
+    with np.errstate(divide="ignore"):
+        size_factors = estimate_size_factors(counts)
+        return counts / size_factors
+
+
+def estimate_size_factors(counts):
+    """Calculate size factors for DESeq's median-of-ratios normalization."""
+
+    def _estimate_size_factors_col(counts, log_geo_means):
+        log_counts = np.log(counts)
+        mask = np.isfinite(log_geo_means) & (counts > 0)
+        return np.exp(np.median((log_counts - log_geo_means)[mask]))
+
+    log_geo_means = np.mean(np.log(counts), axis=1)
+    size_factors = np.apply_along_axis(
+        _estimate_size_factors_col, axis=0,
+        arr=counts, log_geo_means=log_geo_means)
+
+    return size_factors
+
 rule all:
     input:
         PATH_OUT + 'featurecounts.log2.txt',
