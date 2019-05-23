@@ -3,11 +3,15 @@ import pandas as pd
 import os, sys, glob
 import numpy as np
 
-PATH_FASTQ = ['fastq/']
+configfile: 'config.yaml'
+
+PATH_FASTQ = config['path']['fastq']
+print(PATH_FASTQ)
 
 Files = []
 for p in PATH_FASTQ:
-    Files = Files + glob.glob(p + '*.fastq.gz')
+    Files = Files + glob.glob(path.join(p, '*.fastq.gz'))
+    print(Files)
 #   ignore = filter(lambda file: not file.endswith('_trimmed.fastq.gz'), p)
 #   filter(lambda Files: not file.endswith('_trimmed.fastq.gz'), Files)
 
@@ -81,12 +85,12 @@ rule trimmomatic:
     input:
         '{path}/{fastq}.fastq.gz'
     output:
-        '{path}/{fastq,[a-zA-Z0-9-_]+}_trimmed.fastq.gz',
+        temp('{path}/{fastq,[a-zA-Z0-9-_]+}_trimmed.fastq.gz')
     params:
         trimmer = ["TRAILING:3"] # Cut bases off the end of a read, if below a threshold quality, use LEADING for begining
     threads: 4
-#    log:
-#        PATH_LOG + '{fastq}.log'
+    log:
+        PATH_LOG + '{fastq}.log'
     wrapper:
         "0.31.1/bio/trimmomatic/se" # Trim single-end reads
 
@@ -99,7 +103,7 @@ rule star_alignment:
         PATH_LOG + '{sample}_star.log'
     params:
         index='/home/y.kim1/Resource/STAR_index/GRCh37.75/'
-    threads:15
+    threads: config['star']['threads']
     wrapper:
         "0.34.0/bio/star/align" # v = 0.32.0 /
 
