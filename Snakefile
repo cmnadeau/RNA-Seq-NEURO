@@ -6,6 +6,11 @@ import numpy as np
 configfile: 'config.yaml'
 
 PATH_FASTQ = config['path']['fastq']
+PATH_LOG = config['path']['log']
+PATH_QC = config['path']['qc']
+PATH_BAM = config['path']['bam']
+PATH_OUT = config['path']['out']
+
 print(PATH_FASTQ)
 
 Files = []
@@ -18,13 +23,9 @@ for p in PATH_FASTQ:
 
 RNAIDs = [f.split('/')[-1].split('.')[0] for f in Files]
 IDtoPath = dict()
+
 for f in Files:
     IDtoPath[f.split('/')[-1].split('.')[0]] = '/'.join(f.split('/')[:-1]) + '/'
-
-PATH_LOG =  'log/'
-PATH_QC = 'data/RNA_seq/qc/'
-PATH_BAM = 'data/RNA_seq/bams/'
-PATH_OUT = 'data/RNA_seq/output/'
 
 print(RNAIDs)
 
@@ -73,7 +74,7 @@ rule featurecount:
         PATH_OUT + 'featurecounts.txt'
     log:
         PATH_LOG + 'featurecount_log'
-    threads:20
+    threads: config['ftcount']['threads']
     params:
         annot = '/home/y.kim1/Resource/gtf/Homo_sapiens.GRCh37.75.gtf'
     shell:
@@ -87,12 +88,13 @@ rule trimmomatic:
     output:
         temp('{path}/{fastq,[a-zA-Z0-9-_]+}_trimmed.fastq.gz')
     params:
-        trimmer = ["TRAILING:3"] # Cut bases off the end of a read, if below a threshold quality, use LEADING for begining
-    threads: 4
+       config['trim']['params']['trimmer']
+    threads:
+        config['trim']['threads']
     log:
         PATH_LOG + '{fastq}.log'
     wrapper:
-        "0.31.1/bio/trimmomatic/se" # Trim single-end reads
+        "0.34.0/bio/trimmomatic/se" # Trim single-end reads
 
 rule star_alignment:
     input:
@@ -103,9 +105,10 @@ rule star_alignment:
         PATH_LOG + '{sample}_star.log'
     params:
         index='/home/y.kim1/Resource/STAR_index/GRCh37.75/'
-    threads: config['star']['threads']
+    threads:
+        config['star']['threads']
     wrapper:
-        "0.34.0/bio/star/align" # v = 0.32.0 /
+        "0.34.0/bio/star/align" # Map SE reads with STAR
 
 rule filter_bam:
     input:
@@ -113,7 +116,7 @@ rule filter_bam:
     output:
         PATH_BAM+'{sample}.mq20.bam'
     params:
-        '-b -h -q20' #-qINT Skip alignments with MAPQ smaller than INT [0].
+        config['bam']['params']
     wrapper:
         '0.34.0/bio/samtools/view' # convert or filter SAM/BAM;
 
