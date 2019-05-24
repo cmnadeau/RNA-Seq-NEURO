@@ -1,4 +1,29 @@
+##############################################
+############ Path configuration ##############
+##############################################
 
 path:
     fastq: ['fastq/']
+    log: ['log/']
+    qc: ['data/RNA_seq/qc/']
+    bam: ['data/RNA_seq/bams/']
+    out: ['data/RNA_seq/output/']
 
+
+##############################################
+############ Software options ################
+##############################################
+
+ftcount:
+    threads: 20
+
+trim:
+    params:
+        trimmer = ["TRAILING:3"] # Cut bases off the end of a read, if below a threshold quality; use LEADING for begining
+    threads: 4
+
+star:
+    threads: 15
+
+bam:
+    params: '-b -h -q20' #-qINT Skip alignments with MAPQ smaller than INT [0].
