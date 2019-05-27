@@ -16,6 +16,8 @@ path:
 ##############################################
 ############ Software options ################
 ##############################################
+index:
+    threads: 20 # set the maximum number of available core
 
 ftcount:
     threads: 20
