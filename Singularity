@@ -7,7 +7,7 @@ Include: yum
     export PATH=/usr/local/bin:$PATH
 
 %post
-    ./environemnt
+    ./environment
 
     apt-get -y update
     apt-get -qq -y install curl
