@@ -10,6 +10,7 @@ PATH_LOG = config['path']['log']
 PATH_QC = config['path']['qc']
 PATH_BAM = config['path']['bam']
 PATH_OUT = config['path']['out']
+PATH_STAR = config['path']['star']
 
 print(PATH_FASTQ)
 
@@ -56,6 +57,25 @@ rule all:
     input:
         PATH_OUT + 'featurecounts.log2.txt',
         PATH_QC + 'multiqc.html'
+     
+rule index:
+        input:
+            fa = config['fasta'], # provide your reference FASTA file
+            gtf = config['gtf'] # provide your GTF file
+        output: PATH_STAR # you can also rename the index folder
+        threads: 20 # set the maximum number of available cores
+        shell:"""
+            STAR --runThreadN {threads} 
+            --runMode genomeGenerate 
+            --genomeDir {output} 
+            --genomeFastaFiles {input.fa} 
+            --sjdbGTFfile {input.gtf} 
+            --sjdbOverhang 100
+            # cleanup
+            rm -rf _STARtmp
+            mkdir -p logs/star
+            mv Log.out logs/star/star_index.log
+            """        
 
 rule normalize_counts:
     input:
@@ -76,7 +96,7 @@ rule featurecount:
         PATH_LOG + 'featurecount_log'
     threads: config['ftcount']['threads']
     params:
-        annot = '/home/y.kim1/Resource/gtf/Homo_sapiens.GRCh37.75.gtf'
+        annot = PATH_STAR + '{star}+_.gtf'
     shell:
         """
         featureCounts -p -g gene_id -a {params.annot} -o {output} -T {threads} {input} 2> {log}
@@ -104,7 +124,7 @@ rule star_alignment:
     log:
         PATH_LOG + '{sample}_star.log'
     params:
-        index='/home/y.kim1/Resource/STAR_index/GRCh37.75/'
+        index = PATH_STAR 
     threads:
         config['star']['threads']
     wrapper:
