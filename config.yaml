@@ -21,9 +21,14 @@ trim:
     params:
         trimmer = ["TRAILING:3"] # Cut bases off the end of a read, if below a threshold quality; use LEADING for begining
     threads: 4
+    #For more options check the manual @ http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf
 
 star:
     threads: 15
 
 bam:
-    params: '-b -h -q20' #-qINT Skip alignments with MAPQ smaller than INT [0].
+    params: '-b -h -q20' 
+    #-b Output in the BAM format.
+    #-h Include the header in the output.
+    #-qINT Skip alignments with MAPQ smaller than INT [0]
+    #For more options check the manual @ http://www.htslib.org/doc/samtools.html
