@@ -11,6 +11,8 @@ PATH_QC = config['path']['qc']
 PATH_BAM = config['path']['bam']
 PATH_OUT = config['path']['out']
 PATH_STAR = config['path']['star']
+PATH_FASTA = config['path']['fa_star']
+PATH_GTF = config['path']['gtf_star']
 
 print(PATH_FASTQ)
 
@@ -60,10 +62,10 @@ rule all:
      
 rule index:
         input:
-            fa = config['fasta'], # provide your reference FASTA file
-            gtf = config['gtf'] # provide your GTF file
-        output: PATH_STAR # you can also rename the index folder
-        threads: 20 # set the maximum number of available cores
+            fa = config['fa_star'], # provide your reference FASTA file
+            gtf = config['gtf_star'] # provide your GTF file
+        output: PATH_STAR
+        threads: 20 
         shell:"""
             STAR --runThreadN {threads} 
             --runMode genomeGenerate 
@@ -73,8 +75,8 @@ rule index:
             --sjdbOverhang 100
             # cleanup
             rm -rf _STARtmp
-            mkdir -p logs/star
-            mv Log.out logs/star/star_index.log
+            mkdir -p log/star
+            mv Log.out log/star/star_index.log
             """        
 
 rule normalize_counts:
