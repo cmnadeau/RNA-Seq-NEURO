@@ -8,6 +8,7 @@ path:
     qc: 'data/RNA_seq/qc/'
     bam: 'data/RNA_seq/bams/'
     out: 'data/RNA_seq/output/'
+    star: 'STARindex/'
 
 
 ##############################################
