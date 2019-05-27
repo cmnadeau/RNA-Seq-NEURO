@@ -9,8 +9,8 @@ path:
     bam: 'data/RNA_seq/bams/'
     out: 'data/RNA_seq/output/'
     star: 'STARindex/'
-    fasta_star:'STARindex/fasta/'
-    gtf_star: 'STARindex/gtf'
+    fa_star:'STARindex/fasta/'
+    gtf_star: 'STARindex/gtf/'
 
 
 ##############################################
