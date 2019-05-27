@@ -4,10 +4,10 @@
 
 path:
     fastq: ['fastq/']
-    log: ['log/']
-    qc: ['data/RNA_seq/qc/']
-    bam: ['data/RNA_seq/bams/']
-    out: ['data/RNA_seq/output/']
+    log: 'log/'
+    qc: 'data/RNA_seq/qc/'
+    bam: 'data/RNA_seq/bams/'
+    out: 'data/RNA_seq/output/'
 
 
 ##############################################
@@ -19,7 +19,7 @@ ftcount:
 
 trim:
     params:
-        trimmer = ["TRAILING:3"] # Cut bases off the end of a read, if below a threshold quality; use LEADING for begining
+        trimmer: "TRAILING:3" # Cut bases off the end of a read, if below a threshold quality; use LEADING for begining
     threads: 4
     #For more options check the manual @ http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf
 
