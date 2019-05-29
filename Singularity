@@ -10,7 +10,7 @@ Include: yum
     ./environment
 
     yum -y update
-    yum -qq -y install curl tar bzip2
+    yum -qq -y install curl tar bzip2 git
     curl -sSL https://repo.continuum.io/archive/Anaconda2-5.0.1-Linux-x86_64.sh -o /tmp/miniconda.sh
     bash /tmp/miniconda.sh -bfp /usr/local
     rm -rf /tmp/miniconda.sh
