@@ -10,27 +10,46 @@ PATH_LOG = config['path']['log']
 PATH_QC = config['path']['qc']
 PATH_BAM = config['path']['bam']
 PATH_OUT = config['path']['out']
-PATH_STAR = config['path']['star']
-PATH_FASTA = config['path']['fa_star']
-PATH_GTF = config['path']['gtf_star']
 
-print(PATH_FASTQ)
+PATH_STARINDEX = config['star']['index']
+PATH_FASTA = config['star']['fasta']
+PATH_GTF = config['star']['gtf']
+
+PLATFORM = config['platform']['SEorPE'] # SE or PE
+PREFIX = config['platform']['prefix']
 
 Files = []
+RNAIDs = []
 for p in PATH_FASTQ:
-    Files = Files + glob.glob(path.join(p, '*.fastq.gz'))
-    print(Files)
-#   ignore = filter(lambda file: not file.endswith('_trimmed.fastq.gz'), p)
-#   filter(lambda Files: not file.endswith('_trimmed.fastq.gz'), Files)
+    if PLATFORM in ['SE', 'se']:
+        for prefix in PREFIX:
+            NewFile = glob.glob(path.join(p, '*'+prefix+'.fastq.gz'))
+            RNAIDs = RNAIDs + [f.split('/')[-1].split(prefix)[0] for f in NewFile]
+            Files = Files + NewFile
+    if PLATFORM in ['PE', 'pe']:
+        R1 = glob.glob(path.join(p, '*'+PREFIX[0]+'.fastq.gz'))
+        R2 = glob.glob(path.join(p, '*'+PREFIX[1]+'.fastq.gz'))
+        ID_R1 = [f.split('/')[-1].split(PREFIX[0])[0] for f in R1]
+        ID_R2 = [f.split('/')[-1].split(PREFIX[1])[0] for f in R2]
+        if not set(ID_R1) == set(ID_R2):
+            Mismatch = list(set(ID_R1)-set(ID_R2)) + list(set(ID_R2)-set(ID_R1))
+            raise Exception("Missing pairs: " + ' '.join(Mismatch))
+        RNAIDs = ID_R1
+        Files = Files + R1 + R2
 
 
-RNAIDs = [f.split('/')[-1].split('.')[0] for f in Files]
-IDtoPath = dict()
+def ID2Fasta(ID, PLATFORM):
+    if PLATFORM in ['SE', 'se']:
+        return [s for s in Files if ID in s] 
+    if PLATFORM in ['PE', 'pe']:
+        return [s for s in Files if ID in s and PREFIX[1] in s] + [s for s in Files if ID in s and PREFIX[2] in s]
+        
 
-for f in Files:
-    IDtoPath[f.split('/')[-1].split('.')[0]] = '/'.join(f.split('/')[:-1]) + '/'
+def ID2FastqPath(ID):
+    return '/'.join([s for s in Files if ID in s][0].split('/')[:-1])
 
 print(RNAIDs)
+print(Files)
 
 def normalize_counts(counts):
     """Normalizes expression counts using DESeq's median-of-ratios approach."""
@@ -60,24 +79,24 @@ rule all:
         PATH_OUT + 'featurecounts.log2.txt',
         PATH_QC + 'multiqc.html'
      
-rule index:
-        input:
-            fa = config['fa_star'], # provide your reference FASTA file
-            gtf = config['gtf_star'] # provide your GTF file
-        output: PATH_STAR
-        threads: 20 
-        shell:"""
-            STAR --runThreadN {threads} 
-            --runMode genomeGenerate 
-            --genomeDir {output} 
-            --genomeFastaFiles {input.fa} 
-            --sjdbGTFfile {input.gtf} 
-            --sjdbOverhang 100
-            # cleanup
-            rm -rf _STARtmp
-            mkdir -p log/star
-            mv Log.out log/star/star_index.log
-            """        
+#rule index:
+#        input:
+#            fa = config['fa_star'], # provide your reference FASTA file
+#            gtf = config['gtf_star'] # provide your GTF file
+#        output: PATH_STARINDEX
+#        threads: 20 
+#        shell:"""
+#            STAR --runThreadN {threads} 
+#            --runMode genomeGenerate 
+#            --genomeDir {output} 
+#            --genomeFastaFiles {input.fa} 
+#            --sjdbGTFfile {input.gtf} 
+#            --sjdbOverhang 100
+#            # cleanup
+#            rm -rf _STARtmp
+#            mkdir -p log/star
+#            mv Log.out log/star/star_index.log
+#            """        
 
 rule normalize_counts:
     input:
@@ -98,40 +117,76 @@ rule featurecount:
         PATH_LOG + 'featurecount_log'
     threads: config['ftcount']['threads']
     params:
-        annot = PATH_STAR + '{star}+_.gtf'
+        annot = PATH_GTF 
     shell:
         """
         featureCounts -p -g gene_id -a {params.annot} -o {output} -T {threads} {input} 2> {log}
         """
 
-rule trimmomatic:
-    input:
-        '{path}/{fastq}.fastq.gz'
-    output:
-        temp('{path}/{fastq,[a-zA-Z0-9-_]+}_trimmed.fastq.gz')
-    params:
-       config['trim']['params']['trimmer']
-    threads:
-        config['trim']['threads']
-    log:
-        PATH_LOG + '{fastq}.log'
-    wrapper:
-        "0.34.0/bio/trimmomatic/se" # Trim single-end reads
+#if PLATFORM in ['SE', 'se']:
+#    rule trimmomatic:
+#        input:
+#            '{path}/{fastq}.fastq.gz'
+#        output:
+#            temp('{path}/{fastq,[a-zA-Z0-9-_]+}_trimmed.fastq.gz')
+#        params:
+#            config['trim']['params']['trimmer']
+#        threads:
+#            config['trim']['threads']
+#        log:
+#            PATH_LOG + '{fastq}.log'
+#        wrapper:
+#            "0.34.0/bio/trimmomatic/se" # Trim single-end reads
 
-rule star_alignment:
-    input:
-       fq1 = lambda wildcards: IDtoPath[wildcards.sample] + wildcards.sample + '_trimmed.fastq.gz'
-    output:
-        PATH_BAM + '{sample}/Aligned.out.bam'
-    log:
-        PATH_LOG + '{sample}_star.log'
-    params:
-        index = PATH_STAR 
-    threads:
-        config['star']['threads']
-    wrapper:
-        "0.34.0/bio/star/align" # Map SE reads with STAR
+#    rule star_alignment:
+#        input:
+#           fq1 = lambda wildcards: IDtoPath[wildcards.sample] + wildcards.sample + '_trimmed.fastq.gz'
+#        output:
+#            PATH_BAM + '{sample}/Aligned.out.bam'
+#        log:
+#            PATH_LOG + '{sample}_star.log'
+#        params:
+#            index = PATH_STARINDEX
+#        threads:
+#            config['star']['threads']
+#        wrapper:
+#            "0.34.0/bio/star/align" # Map SE reads with STAR
 
+if PLATFORM in ['PE', 'pe']:
+    rule trimmomatic:
+        input:
+            r1 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[0] + '.fastq.gz'),
+            r2 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[1] + '.fastq.gz')
+        output:
+            r1= temp(path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed.fastq.gz')),
+            r2= temp(path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')),
+            r1_unpaired= temp(path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz')),
+            r2_unpaired= temp(path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz'))
+        params:
+            trimmer = config['trim']['params']['trimmer']
+        threads:
+            config['trim']['threads']
+        log:
+            PATH_LOG + '{sample}.trimmomatic.log'
+        wrapper:
+            "0.34.0/bio/trimmomatic/pe" # Trim single-end reads
+
+    rule star_alignment:
+        input:
+           fq1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.trimmed.fastq.gz'),
+           fq2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.trimmed.fastq.gz')
+        output:
+            PATH_BAM + '{sample}/Aligned.out.bam'
+        log:
+            PATH_LOG + '{sample}_star.log'
+        params:
+            index = PATH_STARINDEX 
+        threads:
+            config['star']['threads']
+        wrapper:
+            "0.34.0/bio/star/align" # Map PE reads with STAR
+
+   
 rule filter_bam:
     input:
         PATH_BAM+'{sample}/Aligned.out.bam'
@@ -144,7 +199,7 @@ rule filter_bam:
 
 rule fastqc_fastq:
     input:
-        lambda wildcards: IDtoPath[wildcards.sample] +wildcards.sample + '_trimmed.fastq.gz'
+        PATH_BAM + '{sample}/Aligned.out.bam'
     output:
         html=PATH_QC+"{sample}_fastqc.html",
         zip=PATH_QC+"{sample}_fastqc.zip"
