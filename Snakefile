@@ -234,7 +234,7 @@ rule multiqc:
     input:
         expand(PATH_QC+"{sample}_fastqc.zip", sample=RNAIDs)
     output:
-        PATH_QC+'multiqc.html'
+        PATH_OUT+'multiqc.html'
     log:
         PATH_LOG+'multiqc.log'
     wrapper:
