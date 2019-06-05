@@ -77,8 +77,8 @@ def estimate_size_factors(counts):
 rule all:
     input:
         PATH_OUT + 'featurecounts.log2.txt',
-        PATH_QC + 'multiqc.html'
-        PATH_OUT + 'compress_fastq.zip'
+        PATH_OUT + 'multiqc.html',
+        PATH_OUT + 'compress_fastq.zip',
         PATH_OUT + 'compress_bam.zip'
 
 rule zip_fastq:
@@ -88,7 +88,7 @@ rule zip_fastq:
         PATH_OUT + 'compress_fastq.zip'
     shell:
         """
-        zip {output} Files
+        zip {output} {input} 
         """
         
 
@@ -99,7 +99,7 @@ rule zip_bams:
         PATH_OUT + 'compress_bam.zip'
     shell:
         """
-        zip {output} Files
+        zip {output} {input} 
         """
 
      
