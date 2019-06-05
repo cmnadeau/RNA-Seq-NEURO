@@ -34,7 +34,7 @@ for p in PATH_FASTQ:
         if not set(ID_R1) == set(ID_R2):
             Mismatch = list(set(ID_R1)-set(ID_R2)) + list(set(ID_R2)-set(ID_R1))
             raise Exception("Missing pairs: " + ' '.join(Mismatch))
-        RNAIDs = ID_R1
+        RNAIDs = RNAIDs + ID_R1
         Files = Files + R1 + R2
 
 
@@ -49,7 +49,7 @@ def ID2FastqPath(ID):
     return '/'.join([s for s in Files if ID in s][0].split('/')[:-1])
 
 print(RNAIDs)
-print(Files)
+#print(Files)
 
 def normalize_counts(counts):
     """Normalizes expression counts using DESeq's median-of-ratios approach."""
@@ -78,6 +78,30 @@ rule all:
     input:
         PATH_OUT + 'featurecounts.log2.txt',
         PATH_QC + 'multiqc.html'
+        PATH_OUT + 'compress_fastq.zip'
+        PATH_OUT + 'compress_bam.zip'
+
+rule zip_fastq:
+    input:
+        Files
+    output:
+        PATH_OUT + 'compress_fastq.zip'
+    shell:
+        """
+        zip {output} Files
+        """
+        
+
+rule zip_bams:
+    input:
+        expand(PATH_BAM + '{sample}.mq20.bam', sample=RNAIDs)
+    output:
+        PATH_OUT + 'compress_bam.zip'
+    shell:
+        """
+        zip {output} Files
+        """
+
      
 #rule index:
 #        input:
@@ -199,7 +223,7 @@ rule filter_bam:
 
 rule fastqc_fastq:
     input:
-        PATH_BAM + '{sample}/Aligned.out.bam'
+        PATH_BAM + '{sample}.mq20.bam'
     output:
         html=PATH_QC+"{sample}_fastqc.html",
         zip=PATH_QC+"{sample}_fastqc.zip"
@@ -214,4 +238,4 @@ rule multiqc:
     log:
         PATH_LOG+'multiqc.log'
     wrapper:
-        '0.34.0/bio/multiqc' # modular tool to aggregate results from bioinformatics analyses across many samples into a single report
+        '0.35.0/bio/multiqc' # modular tool to aggregate results from bioinformatics analyses across many samples into a single report
