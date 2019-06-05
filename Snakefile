@@ -200,7 +200,7 @@ if PLATFORM in ['PE', 'pe']:
            fq1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.trimmed.fastq.gz'),
            fq2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.trimmed.fastq.gz')
         output:
-            PATH_BAM + '{sample}/Aligned.out.bam'
+            temp(PATH_BAM + '{sample}/Aligned.out.bam')
         log:
             PATH_LOG + '{sample}_star.log'
         params:
