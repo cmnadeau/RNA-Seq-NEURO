@@ -37,13 +37,9 @@ for p in PATH_FASTQ:
         RNAIDs = RNAIDs + ID_R1
         Files = Files + R1 + R2
 
-
-def ID2Fasta(ID, PLATFORM):
-    if PLATFORM in ['SE', 'se']:
-        return [s for s in Files if ID in s] 
-    if PLATFORM in ['PE', 'pe']:
-        return [s for s in Files if ID in s and PREFIX[1] in s] + [s for s in Files if ID in s and PREFIX[2] in s]
-        
+RNAIDs = list(set(RNAIDs))
+def ID2TrimmedFastq(ID, EXTENSION):
+    return List COMPREHENSION to find ALL FILES THAT CONTAINES ID (ADD EXTENSSION)
 
 def ID2FastqPath(ID):
     return '/'.join([s for s in Files if ID in s][0].split('/')[:-1])
@@ -150,7 +146,7 @@ rule featurecount:
 if PLATFORM in ['SE', 'se']:
     rule trimmomatic:
         input:
-            PATH_FASTQ + '{sample}.fastq.gz
+            PATH_FASTQ + '{sample}.fastq.gz'
         output:
             temp(path.join(PATH_FASTQ, '{sample}' + '.trimmed.fastq.gz'))
         params:
@@ -164,7 +160,7 @@ if PLATFORM in ['SE', 'se']:
 
     rule star_alignment:
         input:
-            fq1 = lambda wildcards: IDtoPath[wildcards.sample] + wildcards.sample + '.trimmed.fastq.gz'
+            fq1 = lambda wildcards: NEW_FUNCTION_YOUWRITE[wildcards.sample] + wildcards.sample + '.trimmed.fastq.gz'
         output:
             PATH_BAM + '{sample}/Aligned.out.bam'
         log:
@@ -186,7 +182,7 @@ if PLATFORM in ['PE', 'pe']:
         output:
             r1= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz')),
             r2= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')),
-            r1_unpaired= temp(path.join(PATH_FASTQ', '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz')),
+            r1_unpaired= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz')),
             r2_unpaired= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz'))
         params:
             trimmer = config['trim']['params']['trimmer']
