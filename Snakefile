@@ -146,46 +146,48 @@ rule featurecount:
         """
         featureCounts -p -g gene_id -a {params.annot} -o {output} -T {threads} {input} 2> {log}
         """
+        
+if PLATFORM in ['SE', 'se']:
+    rule trimmomatic:
+        input:
+            PATH_FASTQ + '{sample}.fastq.gz
+        output:
+            temp(path.join(PATH_FASTQ, '{sample}' + '.trimmed.fastq.gz'))
+        params:
+            config['trim']['params']['trimmer']
+        threads:
+            config['trim']['threads']
+        log:
+            PATH_LOG + '{sample}.trimmomatic.log'
+        wrapper:
+            "0.35.0/bio/trimmomatic/se" # Trim single-end reads
 
-#if PLATFORM in ['SE', 'se']:
-#    rule trimmomatic:
-#        input:
-#            '{path}/{fastq}.fastq.gz'
-#        output:
-#            temp('{path}/{fastq,[a-zA-Z0-9-_]+}_trimmed.fastq.gz')
-#        params:
-#            config['trim']['params']['trimmer']
-#        threads:
-#            config['trim']['threads']
-#        log:
-#            PATH_LOG + '{fastq}.log'
-#        wrapper:
-#            "0.34.0/bio/trimmomatic/se" # Trim single-end reads
+    rule star_alignment:
+        input:
+            fq1 = lambda wildcards: IDtoPath[wildcards.sample] + wildcards.sample + '.trimmed.fastq.gz'
+        output:
+            PATH_BAM + '{sample}/Aligned.out.bam'
+        log:
+            PATH_LOG + '{sample}_star.log'
+        params:
+            index = PATH_STARINDEX
+        threads:
+            config['star']['threads']
+        wrapper:
+            "0.35.0/bio/star/align" # Map SE reads with STAR
 
-#    rule star_alignment:
-#        input:
-#           fq1 = lambda wildcards: IDtoPath[wildcards.sample] + wildcards.sample + '_trimmed.fastq.gz'
-#        output:
-#            PATH_BAM + '{sample}/Aligned.out.bam'
-#        log:
-#            PATH_LOG + '{sample}_star.log'
-#        params:
-#            index = PATH_STARINDEX
-#        threads:
-#            config['star']['threads']
-#        wrapper:
-#            "0.34.0/bio/star/align" # Map SE reads with STAR
+
 
 if PLATFORM in ['PE', 'pe']:
     rule trimmomatic:
         input:
-            r1 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[0] + '.fastq.gz'),
-            r2 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[1] + '.fastq.gz')
+            r1 = lambda wildcards: path.join(PATH_FASTQ, wildcards.sample + PREFIX[0] + '.fastq.gz'),
+            r2 = lambda wildcards: path.join(PATH_FASTQ, wildcards.sample + PREFIX[1] + '.fastq.gz')
         output:
-            r1= temp(path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed.fastq.gz')),
-            r2= temp(path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')),
-            r1_unpaired= temp(path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz')),
-            r2_unpaired= temp(path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz'))
+            r1= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz')),
+            r2= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')),
+            r1_unpaired= temp(path.join(PATH_FASTQ', '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz')),
+            r2_unpaired= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz'))
         params:
             trimmer = config['trim']['params']['trimmer']
         threads:
