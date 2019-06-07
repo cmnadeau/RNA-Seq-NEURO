@@ -88,7 +88,7 @@ rule zip_fastq:
         PATH_OUT + 'compress_fastq.zip'
     shell:
         """
-        zip {output} {input} 
+        zip -j {output} {input} 
         """
         
 
@@ -99,7 +99,7 @@ rule zip_bams:
         PATH_OUT + 'compress_bam.zip'
     shell:
         """
-        zip {output} {input} 
+        zip -j {output} {input} 
         """
 
      
