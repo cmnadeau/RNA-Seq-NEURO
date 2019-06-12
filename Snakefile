@@ -38,14 +38,11 @@ for p in PATH_FASTQ:
         Files = Files + R1 + R2
 
 RNAIDs = list(set(RNAIDs))
-def ID2TrimmedFastq(ID, EXTENSION):
-    return List COMPREHENSION to find ALL FILES THAT CONTAINES ID (ADD EXTENSSION)
+def ID2TrimmedFastq(ID, EXT):
+   return [re.sub("fastq.gz", "", file) + EXT for file in Files if ID in file]
 
 def ID2FastqPath(ID):
     return '/'.join([s for s in Files if ID in s][0].split('/')[:-1])
-
-print(RNAIDs)
-#print(Files)
 
 def normalize_counts(counts):
     """Normalizes expression counts using DESeq's median-of-ratios approach."""
@@ -137,20 +134,21 @@ rule featurecount:
         PATH_LOG + 'featurecount_log'
     threads: config['ftcount']['threads']
     params:
-        annot = PATH_GTF 
+        annot = PATH_GTF,
+        others = config['ftcount']['option']
     shell:
         """
-        featureCounts -p -g gene_id -a {params.annot} -o {output} -T {threads} {input} 2> {log}
+        featureCounts {params.others} -g gene_id -a {params.annot} -o {output} -T {threads} {input} 2> {log}
         """
         
 if PLATFORM in ['SE', 'se']:
     rule trimmomatic:
         input:
-            PATH_FASTQ + '{sample}.fastq.gz'
+            path.join('{path}', '{sample}.fastq.gz')
         output:
-            temp(path.join(PATH_FASTQ, '{sample}' + '.trimmed.fastq.gz'))
+            temp(path.join('{path}', '{sample}' + '.trimmed.fastq.gz'))
         params:
-            config['trim']['params']['trimmer']
+            trimmer = config['trim']['params']['trimmer']
         threads:
             config['trim']['threads']
         log:
@@ -160,7 +158,7 @@ if PLATFORM in ['SE', 'se']:
 
     rule star_alignment:
         input:
-            fq1 = lambda wildcards: NEW_FUNCTION_YOUWRITE[wildcards.sample] + wildcards.sample + '.trimmed.fastq.gz'
+            fq1 = lambda wildcards: ID2TrimmedFastq(wildcards.sample, '.trimmed.fastq.gz')
         output:
             PATH_BAM + '{sample}/Aligned.out.bam'
         log:
@@ -177,13 +175,13 @@ if PLATFORM in ['SE', 'se']:
 if PLATFORM in ['PE', 'pe']:
     rule trimmomatic:
         input:
-            r1 = lambda wildcards: path.join(PATH_FASTQ, wildcards.sample + PREFIX[0] + '.fastq.gz'),
-            r2 = lambda wildcards: path.join(PATH_FASTQ, wildcards.sample + PREFIX[1] + '.fastq.gz')
+            r1 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[0] + '.fastq.gz'),
+            r2 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[1] + '.fastq.gz')
         output:
-            r1= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz')),
-            r2= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')),
-            r1_unpaired= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz')),
-            r2_unpaired= temp(path.join(PATH_FASTQ, '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz'))
+            r1= temp(path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed.fastq.gz')),
+            r2= temp(path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')),
+            r1_unpaired= temp(path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz')),
+            r2_unpaired= temp(path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz'))
         params:
             trimmer = config['trim']['params']['trimmer']
         threads:
