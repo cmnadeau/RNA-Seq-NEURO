@@ -7,7 +7,7 @@ This is a [Snakemake](https://snakemake.readthedocs.io/en/stable/) based pipelin
 The pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)), aligns the reads ([STAR](https://github.com/alexdobin/STAR)), generates gene counts ([featureCounts](http://bioinf.wehi.edu.au/featureCounts/)) and performs quality-control on the results ([MultiQC](https://multiqc.info/)).
 
 
-## Instalation
+## Installation
 
 The pipeline is preliminary used in linux environment with conda/singularity available.
 
