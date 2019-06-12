@@ -5,7 +5,7 @@
 platform:
     SEorPE: 'PE' # change to SE if used with single end data
     prefix: ['_R1_001', '_R2_001'] # file name pattern, appended before .fastq.gz (*prefix.fastq.gz)
-                                  # for paired end, two prefix need to be used
+                                   # for paired end, two prefix need to be used
 
 path:
     fastq: ['../../../archive/MPS-396-190306/190515_K00360_0524_AH5J5JBBXY/Unaligned_190516_Path/Path-MPS-396-190306-L0673']
@@ -22,6 +22,7 @@ index:
 
 ftcount:
     threads: 20
+    option: '' #for more options check the manual, e.g., for paired-end add -p option
 
 trim:
     params:
