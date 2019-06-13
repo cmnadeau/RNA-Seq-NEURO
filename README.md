@@ -4,7 +4,7 @@
 
 This is a [Snakemake](https://snakemake.readthedocs.io/en/stable/) based pipeline for RNA-seq used in the [Tumor Genome Core Analysis](http://www.tgac.nl/) housed in the [Cancer Center Amsterdam](https://www.vumc.com/departments/cancer-center-amsterdam.htm), at [Amsterdam UMC location VUmc](https://www.vumc.nl/) and part of the Department of Pathology.
 
-The pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)), aligns the reads ([STAR](https://github.com/alexdobin/STAR)), generates gene counts ([featureCounts](http://bioinf.wehi.edu.au/featureCounts/)) and performs quality-control on the results ([MultiQC](https://multiqc.info/)).
+The pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)), aligns the reads ([STAR](https://github.com/alexdobin/STAR)), generates gene counts ([featureCounts](http://bioinf.wehi.edu.au/featureCounts/)) and performs quality-control on the results ([MultiQC](https://multiqc.info/)). Paired-end (PE) and single-end (SE) are supported.
 
 
 ## Installation
@@ -34,12 +34,6 @@ cd snakemake_RNAseq
 git clone https://github.com/tgac-vumc/RNA-seq
 conda env create --name RNAseq --file env.yaml
 ```
-All the softwares used in the pipeline are installed by conda or executed in wrapper. We recommend to run the pipeline from a different location than the pipeline path, like the example below:
-
-```
-snakemake -s PATH_TO_PIPELINE/Snakefile --use-conda --cores=24
-```
-With --use-conda option, the pipeline will create environments to run rules based on *env.yaml*. **Note** the pipeline assumes that *config.yaml* is available at the location where the pipeline is executed. *config.yaml* is configurable by the user, please check it before running the pipeline.
 
 ### Using Singularity
 
@@ -47,3 +41,18 @@ The singularity container holds a virtual environment of CentOS 7 and it's avail
 ```
 singularity pull shub://tgac-vumc/RNA-seq
 ```
+
+## Path Configuration & Running the pipeline
+
+Before attempting to run the pipeline, please open *config.yaml*. Inside, you will encounter **Path Configuration** and **Software Options**. 
+
+1. On **Path configuration**, first, you have to choose whether your data is PE or SE and after change the fastq path to the path where your fastq files are actually stored.
+2. On **Software Options**, you will find several options that can be modified by the user. Please, have a look at it before running the pipeline. 
+
+All the software used in the pipeline is installed by conda or executed in a wrapper. We recommend to run the pipeline from a different location than the pipeline path, like the example below:
+
+```
+snakemake -s PATH_TO_PIPELINE/Snakefile --use-conda --cores=24
+```
+With --use-conda option, the pipeline will create environments to run rules based on *env.yaml*. 
+**Note** the pipeline assumes that *config.yaml* is available at the location where the pipeline is executed.
