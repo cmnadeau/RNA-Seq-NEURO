@@ -3,7 +3,7 @@
 ##############################################
 
 platform:
-    SEorPE: 'PE' # change to SE if used with single end data
+    SRorPE: 'PE' # change to SR if used with single read data
     prefix: ['_R1_001', '_R2_001'] # file name pattern, appended before .fastq.gz (*prefix.fastq.gz)
                                    # for paired end, two prefix need to be used
 
