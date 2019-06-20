@@ -21,7 +21,7 @@ PREFIX = config['platform']['prefix']
 Files = []
 RNAIDs = []
 for p in PATH_FASTQ:
-    if PLATFORM in ['SE', 'se']:
+    if PLATFORM in ['SR', 'sr']:
         for prefix in PREFIX:
             NewFile = glob.glob(path.join(p, '*'+prefix+'.fastq.gz'))
             RNAIDs = RNAIDs + [f.split('/')[-1].split(prefix)[0] for f in NewFile]
@@ -168,7 +168,7 @@ if PLATFORM in ['SR', 'sr']:
         threads:
             config['star']['threads']
         wrapper:
-            "0.35.0/bio/star/align" # Map SE reads with STAR
+            "0.35.0/bio/star/align" # Map SR reads with STAR
 
 
 
