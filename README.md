@@ -4,7 +4,7 @@
 
 This is a [Snakemake](https://snakemake.readthedocs.io/en/stable/) based pipeline for RNA-seq used in the [Tumor Genome Core Analysis](http://www.tgac.nl/) housed in the [Cancer Center Amsterdam](https://www.vumc.com/departments/cancer-center-amsterdam.htm), at [Amsterdam UMC location VUmc](https://www.vumc.nl/) and part of the Department of Pathology.
 
-The pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)), aligns the reads ([STAR](https://github.com/alexdobin/STAR)), generates gene counts ([featureCounts](http://bioinf.wehi.edu.au/featureCounts/)) and performs quality-control on the results ([MultiQC](https://multiqc.info/)). Paired-end (PE) and single-end (SE) are supported.
+The pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)), aligns the reads ([STAR](https://github.com/alexdobin/STAR)), generates gene counts ([featureCounts](http://bioinf.wehi.edu.au/featureCounts/)) and performs quality-control on the results ([MultiQC](https://multiqc.info/)). Paired-end (PE) and single read (SR) are supported.
 
 <p align="center">
   <img width="850" height="483" src="https://github.com/tgac-vumc/RNA-seq/blob/master/DAG_RNAseq.png">
@@ -49,7 +49,7 @@ singularity pull shub://tgac-vumc/RNA-seq
 
 Before attempting to run the pipeline, please open *config.yaml*. Inside, you will encounter **Path Configuration** and **Software Options**. 
 
-1. On **Path configuration**, first, you have to choose whether your data is PE or SE and after change the fastq path to the path where your fastq files are actually stored.
+1. On **Path configuration**, first, you have to choose whether your data is PE or SR and after change the fastq path to the path where your fastq files are actually stored.
 2. On **Software Options**, you will find several options that can be modified by the user. Please, have a look at it before running the pipeline. 
 
 All the software used in the pipeline is installed by conda or executed in a wrapper. We recommend to run the pipeline from a different location than the pipeline path, like the example below:
