@@ -141,7 +141,7 @@ rule featurecount:
         featureCounts {params.others} -g gene_id -a {params.annot} -o {output} -T {threads} {input} 2> {log}
         """
         
-if PLATFORM in ['SE', 'se']:
+if PLATFORM in ['SR', 'sr']:
     rule trimmomatic:
         input:
             path.join('{path}', '{sample}.fastq.gz')
