@@ -15,7 +15,7 @@ PATH_STARINDEX = config['star']['index']
 PATH_FASTA = config['star']['fasta']
 PATH_GTF = config['star']['gtf']
 
-PLATFORM = config['platform']['SEorPE'] # SE or PE
+PLATFORM = config['platform']['SRorPE'] # SE or PE
 PREFIX = config['platform']['prefix']
 
 Files = []
