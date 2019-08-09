@@ -8,6 +8,7 @@ platform:
                                    # for paired end, two prefix need to be used
 
 path:
+    # fastq can be a list of paths. If analysis start from bam, use an empty list.
     fastq: ['../../../archive/MPS-396-190306/190515_K00360_0524_AH5J5JBBXY/Unaligned_190516_Path/Path-MPS-396-190306-L0673']
     log: 'log/'
     qc: 'data/RNA_seq/qc/'
