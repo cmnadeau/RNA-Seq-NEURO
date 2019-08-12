@@ -41,12 +41,13 @@ if START_FASTQ:
             Files = Files + R1 + R2
 else:
     for prefix in PREFIX:
-        NewFile = glob.glob(path.join(p, '*'+prefix+'.bam'))
-        RNAIDs = RNAIDs + [f.split('/')[-1].split(prefix)[0] for f in NewFile]
+        NewFile = glob.glob(path.join(PATH_BAM, '*'+prefix+'.bam'))
+        RNAIDs = RNAIDs + ['.'.join(f.split('/')[-1].split('.')[:-1]) for f in NewFile]
         Files = Files + NewFile
 
 
 RNAIDs = list(set(RNAIDs))
+print(RNAIDs)
 def ID2TrimmedFastq(ID, EXT):
    return [re.sub("fastq.gz", "", file) + EXT for file in Files if ID in file]
 
@@ -80,7 +81,7 @@ rule all:
     input:
         PATH_OUT + 'featurecounts.log2.txt',
         PATH_OUT + 'multiqc.html',
-        PATH_OUT + 'compress_fastq.zip' if START_FASTQ,
+#        PATH_OUT + 'compress_fastq.zip' if START_FASTQ,
         PATH_OUT + 'compress_bam.zip'
 
 rule zip_fastq:
@@ -215,10 +216,9 @@ if PLATFORM in ['PE', 'pe']:
         wrapper:
             "0.34.0/bio/star/align" # Map PE reads with STAR
 
-   
 rule filter_bam:
     input:
-        PATH_BAM+'{sample}/Aligned.out.bam'
+        lambda wildcards: PATH_BAM+ wildcards.sample+'/Aligned.out.bam' if START_FASTQ else PATH_BAM + wildcards.sample + '.bam'
     output:
         PATH_BAM+'{sample}.mq20.bam'
     params:
