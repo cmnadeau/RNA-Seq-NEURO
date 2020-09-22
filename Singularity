@@ -17,3 +17,5 @@ Include: yum
     
     git clone https://github.com/tgac-vumc/RNA-seq
     conda env create -n RNA-seq -f RNA-seq/env.yaml
+
+
