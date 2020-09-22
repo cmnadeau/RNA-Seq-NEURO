@@ -15,7 +15,8 @@ Include: yum
     bash /tmp/miniconda.sh -bfp /usr/local
     
     git clone https://github.com/tgac-vumc/RNA-seq
-    conda env create -n RNA-seq -f RNA-seq/env.yaml
+    conda install -c conda-forge mamba 
+    mamba create -c conda-forge -c bioconda -n RNA-seq snakemake==5.25.0
 
 
     rm -rf /tmp/miniconda.sh
