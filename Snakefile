@@ -24,7 +24,10 @@ for p in PATH_FASTQ:
     if PLATFORM in ['SR', 'sr']:
         for prefix in PREFIX:
             NewFile = glob.glob(path.join(p, '*'+prefix+'.fastq.gz'))
-            RNAIDs = RNAIDs + [f.split('/')[-1].split(prefix)[0] for f in NewFile]
+            if not prefix is '':
+                RNAIDs = RNAIDs + [f.split('/')[-1].split(prefix)[0] for f in NewFile]
+            else:
+                RNAIDs = RNAIDs + [f.split('/')[-1].split('.fastq.gz')[0] for f in NewFile]
             Files = Files + NewFile
     if PLATFORM in ['PE', 'pe']:
         R1 = glob.glob(path.join(p, '*'+PREFIX[0]+'.fastq.gz'))
@@ -38,8 +41,9 @@ for p in PATH_FASTQ:
         Files = Files + R1 + R2
 
 RNAIDs = list(set(RNAIDs))
+print(RNAIDs)
 def ID2TrimmedFastq(ID, EXT):
-   return [re.sub("fastq.gz", "", file) + EXT for file in Files if ID in file]
+   return [re.sub(".fastq.gz", "", file) + EXT for file in Files if ID in file]
 
 def ID2FastqPath(ID):
     return '/'.join([s for s in Files if ID in s][0].split('/')[:-1])
@@ -146,7 +150,7 @@ if PLATFORM in ['SR', 'sr']:
         input:
             path.join('{path}', '{sample}.fastq.gz')
         output:
-            temp(path.join('{path}', '{sample}' + '.trimmed.fastq.gz'))
+            path.join('{path}', '{sample}' + '.trimmed.fastq.gz')
         params:
             trimmer = config['trim']['params']['trimmer']
         threads:
@@ -154,7 +158,7 @@ if PLATFORM in ['SR', 'sr']:
         log:
             PATH_LOG + '{sample}.trimmomatic.log'
         wrapper:
-            "0.35.0/bio/trimmomatic/se" # Trim single-end reads
+            "0.65.0/bio/trimmomatic/se" # Trim single-end reads
 
     rule star_alignment:
         input:
@@ -168,7 +172,7 @@ if PLATFORM in ['SR', 'sr']:
         threads:
             config['star']['threads']
         wrapper:
-            "0.35.0/bio/star/align" # Map SR reads with STAR
+            "0.65.0/bio/star/align" # Map SR reads with STAR
 
 
 
@@ -178,10 +182,10 @@ if PLATFORM in ['PE', 'pe']:
             r1 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[0] + '.fastq.gz'),
             r2 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[1] + '.fastq.gz')
         output:
-            r1= temp(path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed.fastq.gz')),
-            r2= temp(path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')),
-            r1_unpaired= temp(path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz')),
-            r2_unpaired= temp(path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz'))
+            r1= path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
+            r2= path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
+            r1_unpaired= path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz'),
+            r2_unpaired= path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz')
         params:
             trimmer = config['trim']['params']['trimmer']
         threads:
@@ -196,7 +200,7 @@ if PLATFORM in ['PE', 'pe']:
            fq1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.trimmed.fastq.gz'),
            fq2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.trimmed.fastq.gz')
         output:
-            temp(PATH_BAM + '{sample}/Aligned.out.bam')
+            PATH_BAM + '{sample}/Aligned.out.bam'
         log:
             PATH_LOG + '{sample}_star.log'
         params:
@@ -204,7 +208,7 @@ if PLATFORM in ['PE', 'pe']:
         threads:
             config['star']['threads']
         wrapper:
-            "0.34.0/bio/star/align" # Map PE reads with STAR
+            "0.65.0/bio/star/align" # Map PE reads with STAR
 
    
 rule filter_bam:
@@ -215,7 +219,7 @@ rule filter_bam:
     params:
         config['bam']['params']
     wrapper:
-        '0.34.0/bio/samtools/view' # convert or filter SAM/BAM;
+        '0.65.0/bio/samtools/view' # convert or filter SAM/BAM;
 
 rule fastqc_fastq:
     input:
@@ -224,7 +228,7 @@ rule fastqc_fastq:
         html=PATH_QC+"{sample}_fastqc.html",
         zip=PATH_QC+"{sample}_fastqc.zip"
     wrapper:
-        "0.34.0/bio/fastqc" # generates fastq qc statistics; quality control tool for high throughput sequence data
+        "0.65.0/bio/fastqc" # generates fastq qc statistics; quality control tool for high throughput sequence data
 
 rule multiqc:
     input:
@@ -234,4 +238,4 @@ rule multiqc:
     log:
         PATH_LOG+'multiqc.log'
     wrapper:
-        '0.35.0/bio/multiqc' # modular tool to aggregate results from bioinformatics analyses across many samples into a single report
+        '0.65.0/bio/multiqc' # modular tool to aggregate results from bioinformatics analyses across many samples into a single report
