@@ -13,6 +13,8 @@ Include: yum
     yum -qq -y install curl tar bzip2 git zip
     curl -sSL https://repo.continuum.io/archive/Anaconda2-5.0.1-Linux-x86_64.sh -o /tmp/miniconda.sh
     bash /tmp/miniconda.sh -bfp /usr/local
+    conda update conda -y
+    conda update conda-build -y
     
     git clone https://github.com/tgac-vumc/RNA-seq
     conda install -c conda-forge mamba -y 
