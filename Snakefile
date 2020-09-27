@@ -75,6 +75,7 @@ rule all:
     input:
         PATH_OUT + 'featurecounts.log2.txt',
         PATH_OUT + 'multiqc.html',
+        PATH_OUT + 'multiqc_raw.html',
         PATH_OUT + 'compress_fastq.zip',
         PATH_OUT + 'compress_bam.zip'
 
@@ -156,7 +157,7 @@ if PLATFORM in ['SR', 'sr']:
         threads:
             config['trim']['threads']
         log:
-            PATH_LOG + '{sample}.trimmomatic.log'
+            path.join(PATH_LOG, '{path}', '{sample}.trimmomatic.log')
         wrapper:
             "0.65.0/bio/trimmomatic/se" # Trim single-end reads
 
@@ -164,11 +165,12 @@ if PLATFORM in ['SR', 'sr']:
         input:
             fq1 = lambda wildcards: ID2TrimmedFastq(wildcards.sample, '.trimmed.fastq.gz')
         output:
-            PATH_BAM + '{sample}/Aligned.out.bam'
+            PATH_BAM + '{sample}/Aligned.sortedByCoord.out.bam'
         log:
             PATH_LOG + '{sample}_star.log'
         params:
-            index = PATH_STARINDEX
+            index = PATH_STARINDEX,
+            extra = '--outSAMtype BAM SortedByCoordinate'
         threads:
             config['star']['threads']
         wrapper:
@@ -191,20 +193,21 @@ if PLATFORM in ['PE', 'pe']:
         threads:
             config['trim']['threads']
         log:
-            PATH_LOG + '{sample}.trimmomatic.log'
+            path.join(PATH_LOG, '{path}', '{sample}.trimmomatic.log')
         wrapper:
-            "0.34.0/bio/trimmomatic/pe" # Trim single-end reads
+            "0.65.0/bio/trimmomatic/pe" # Trim single-end reads
 
     rule star_alignment:
         input:
            fq1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.trimmed.fastq.gz'),
            fq2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.trimmed.fastq.gz')
         output:
-            PATH_BAM + '{sample}/Aligned.out.bam'
+            PATH_BAM + '{sample}/Aligned.sortedByCoord.out.bam'
         log:
             PATH_LOG + '{sample}_star.log'
         params:
-            index = PATH_STARINDEX 
+            index = PATH_STARINDEX,
+            extra = '--outSAMtype BAM SortedByCoordinate'
         threads:
             config['star']['threads']
         wrapper:
@@ -213,7 +216,7 @@ if PLATFORM in ['PE', 'pe']:
    
 rule filter_bam:
     input:
-        PATH_BAM+'{sample}/Aligned.out.bam'
+        PATH_BAM+'{sample}/Aligned.sortedByCoord.out.bam'
     output:
         PATH_BAM+'{sample}.mq20.bam'
     params:
@@ -227,6 +230,8 @@ rule fastqc_fastq:
     output:
         html=PATH_QC+"{sample}_fastqc.html",
         zip=PATH_QC+"{sample}_fastqc.zip"
+    log:
+        path.join(PATH_QC, '{sample}.fastqc')
     wrapper:
         "0.65.0/bio/fastqc" # generates fastq qc statistics; quality control tool for high throughput sequence data
 
@@ -239,3 +244,28 @@ rule multiqc:
         PATH_LOG+'multiqc.log'
     wrapper:
         '0.65.0/bio/multiqc' # modular tool to aggregate results from bioinformatics analyses across many samples into a single report
+
+rule fastqc_raw:
+    input:
+        lambda wildcards: [file for file in Files if wildcards.sample in file] 
+    output:
+        html = path.join(PATH_QC, 'raw', '{sample}.html'),
+        zip = path.join(PATH_QC, 'raw', '{sample}_fastqc.zip')
+    log:
+        path.join(PATH_QC, '{sample}.fastqc')
+    wrapper:
+        '0.65.0/bio/fastqc'
+
+rule multiqc_raw:
+    input:
+        lambda wildcards: [path.join(PATH_QC, 'raw', \
+            file.split('/')[-1].split('.fastq.gz')[0] + '_fastqc.zip') \
+            for file in Files]
+    output:
+        PATH_OUT+'multiqc_raw.html'
+    log:
+        PATH_LOG+'multiqc_raw.log'
+    wrapper:
+        '0.65.0/bio/multiqc'
+
+ruleorder: fastqc_raw > star_alignment
