@@ -1,6 +1,6 @@
 # RNA-seq analysis pipeline 
 
-[![Snakemake](https://img.shields.io/badge/snakemake-≥3.13.3-brightgreen.svg?style=flat-square)](https://snakemake.bitbucket.io) [![singularity-hub](https://img.shields.io/badge/install%20with-singularity--hub-red.svg)](https://singularity-hub.org/collections/3066) [![miniconda](https://img.shields.io/badge/install%20with-conda-green.svg)](https://docs.conda.io/en/latest/miniconda.html)
+[![Snakemake](https://img.shields.io/badge/snakemake==5.25.0-brightgreen.svg?style=flat-square)](https://snakemake.bitbucket.io) [![singularity-hub](https://img.shields.io/badge/install%20with-singularity--hub-red.svg)](https://singularity-hub.org/collections/3066) [![miniconda](https://img.shields.io/badge/install%20with-conda-green.svg)](https://docs.conda.io/en/latest/miniconda.html)
 
 This is a [Snakemake](https://snakemake.readthedocs.io/en/stable/) based pipeline for RNA-seq used in the [Tumor Genome Core Analysis](http://www.tgac.nl/) housed in the [Cancer Center Amsterdam](https://www.vumc.com/departments/cancer-center-amsterdam.htm), at [Amsterdam UMC location VUmc](https://www.vumc.nl/) and part of the Department of Pathology.
 
