@@ -11,14 +11,13 @@ Include: yum
 
     yum -y update
     yum -qq -y install curl tar bzip2 git zip
-    curl -sSL https://repo.continuum.io/archive/Anaconda2-5.0.1-Linux-x86_64.sh -o /tmp/miniconda.sh
+    curl -sSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh
     bash /tmp/miniconda.sh -bfp /usr/local
     conda update conda -y
-    conda update conda-build -y
     
     git clone https://github.com/tgac-vumc/RNA-seq
-    conda install -c conda-forge mamba -y 
-    mamba create -c conda-forge -c bioconda -n RNA-seq snakemake==5.25.0 subread -y
+    conda install mamba -c conda-forge -y
+    mamba install -c conda-forge -c bioconda snakemake==5.25.0 subread -y
 
 
     rm -rf /tmp/miniconda.sh
