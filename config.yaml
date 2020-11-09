@@ -3,12 +3,13 @@
 ##############################################
 
 platform:
-    SRorPE: 'PE' # change to SR if used with single read data
-    prefix: ['_R1_001', '_R2_001'] # file name pattern, appended before .fastq.gz (*prefix.fastq.gz)
+    SRorPE: 'SR' # change to SR if used with single read data
+    prefix: ['_L004_R1', '_L004_R2', '_L004_R3']
+    # file name pattern, appended before .fastq.gz (*prefix.fastq.gz)
                                    # for paired end, two prefix need to be used
 
 path:
-    fastq: ['../../../archive/MPS-396-190306/190515_K00360_0524_AH5J5JBBXY/Unaligned_190516_Path/Path-MPS-396-190306-L0673']
+    fastq: ['/home/y.kim1/Projects/RNAseq_Virus/data/']
     log: 'log/'
     qc: 'data/RNA_seq/qc/'
     bam: 'data/RNA_seq/bams/'

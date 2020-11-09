@@ -130,6 +130,13 @@ rule normalize_counts:
         norm_counts = np.log2(normalize_counts(counts) + 1)
         norm_counts.to_csv(output[0], sep="\t", index=True)
 
+def feature_counts_extra(wildcards):
+    extra = config["ftcount"]["option"]
+    if PLATFORM in ['PE', 'pe']:
+        extra += " -p"
+    return extra
+
+
 rule featurecount:
     input:
         expand(PATH_BAM + '{sample}.mq20.bam', sample=RNAIDs)
@@ -140,10 +147,10 @@ rule featurecount:
     threads: config['ftcount']['threads']
     params:
         annot = PATH_GTF,
-        others = config['ftcount']['option']
+        others = feature_counts_extra 
     shell:
         """
-        featureCounts {params.others} -g gene_id -a {params.annot} -o {output} -T {threads} {input} 2> {log}
+        featureCounts {params.others} -a {params.annot} -o {output} -T {threads} {input} 2> {log}
         """
         
 if PLATFORM in ['SR', 'sr']:
@@ -165,7 +172,7 @@ if PLATFORM in ['SR', 'sr']:
         input:
             fq1 = lambda wildcards: ID2TrimmedFastq(wildcards.sample, '.trimmed.fastq.gz')
         output:
-            PATH_BAM + '{sample}/Aligned.sortedByCoord.out.bam'
+            PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.sortedByCoord.out.bam'
         log:
             PATH_LOG + '{sample}_star.log'
         params:
@@ -202,7 +209,7 @@ if PLATFORM in ['PE', 'pe']:
            fq1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.trimmed.fastq.gz'),
            fq2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.trimmed.fastq.gz')
         output:
-            PATH_BAM + '{sample}/Aligned.sortedByCoord.out.bam'
+            PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.sortedByCoord.out.bam'
         log:
             PATH_LOG + '{sample}_star.log'
         params:
