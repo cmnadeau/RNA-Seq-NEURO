@@ -3,17 +3,18 @@
 ##############################################
 
 platform:
-    SRorPE: 'SR' # change to SR if used with single read data
-    prefix: ['_L004_R1', '_L004_R2', '_L004_R3']
+    SRorPE: 'PE' # change to SR if used with single read data
+    prefix: ['_L003_R1', '_L003_R2']
     # file name pattern, appended before .fastq.gz (*prefix.fastq.gz)
                                    # for paired end, two prefix need to be used
 
 path:
-    fastq: ['/home/y.kim1/Projects/RNAseq_Virus/data/']
+    fastq: ['/home/y.kim1/Projects/RNAseqDeconvolution/PBMCInhouse/data']
+    trimmed: 'data/trimmed/'
     log: 'log/'
-    qc: 'data/RNA_seq/qc/'
-    bam: 'data/RNA_seq/bams/'
-    out: 'data/RNA_seq/output/'
+    qc: 'outcome/qc/'
+    bam: 'outcome/bams/'
+    out: 'outcome/output/'
 
 ##############################################
 ############ Software options ################
@@ -27,15 +28,16 @@ ftcount:
 
 trim:
     params:
-        trimmer: ["ILLUMINACLIP:/home/y.kim1/Resource/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10"] # Cut bases off the end of a read, if below a threshold quality; use LEADING for begining
+        trimmer: ["ILLUMINACLIP:/net/nfs/PAT/archive/Resource/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10"] # Cut bases off the end of a read, if below a threshold quality; use LEADING for begining
     threads: 10 
     #For more options check the manual @ http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf
 
 star:
     threads: 15
-    index: '/home/y.kim1/Resource/STAR_index/'
+    index: '/net/nfs/PAT/archive/Resource/STAR_index/GRCh37.75/'
     fasta: 'STARindex/fasta/'
-    gtf: '/home/y.kim1/Resource/gtf/Homo_sapiens.GRCh37.75.gtf'
+    fasta_index: '/net/nfs/PAT/archive/Resource/fasta/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa'
+    gtf: '/net/nfs/PAT/archive/Resource/gtf/Homo_sapiens.GRCh37.75.gtf'
 
 bam:
     params: '-b -h -q20' 

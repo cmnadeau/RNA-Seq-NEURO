@@ -6,6 +6,7 @@ import numpy as np
 configfile: 'config.yaml'
 
 PATH_FASTQ = config['path']['fastq']
+PATH_TRIMMED = config['path']['trimmed']
 PATH_LOG = config['path']['log']
 PATH_QC = config['path']['qc']
 PATH_BAM = config['path']['bam']
@@ -100,7 +101,16 @@ rule zip_bams:
         zip -j {output} {input} 
         """
 
-     
+rule star_index:
+    input:
+        fasta=config['star']['fasta_index']
+    output:
+        directory(config['star']['index'])
+    threads:20
+    log:
+        PATH_LOG + "star_index.log"
+    wrapper:
+        "0.65.0/bio/star/index"
 #rule index:
 #        input:
 #            fa = config['fa_star'], # provide your reference FASTA file
@@ -164,20 +174,21 @@ if PLATFORM in ['SR', 'sr']:
         threads:
             config['trim']['threads']
         log:
-            path.join(PATH_LOG, '{path}', '{sample}.trimmomatic.log')
+            path.join(PATH_LOG, '{sample}.trimmomatic.log')
         wrapper:
             "0.65.0/bio/trimmomatic/se" # Trim single-end reads
 
     rule star_alignment:
         input:
-            fq1 = lambda wildcards: ID2TrimmedFastq(wildcards.sample, '.trimmed.fastq.gz')
+            fq1 = lambda wildcards: ID2TrimmedFastq(wildcards.sample, '.trimmed.fastq.gz'),
+            index = PATH_STARINDEX
         output:
             PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.sortedByCoord.out.bam'
         log:
             PATH_LOG + '{sample}_star.log'
         params:
-            index = PATH_STARINDEX,
-            extra = '--outSAMtype BAM SortedByCoordinate'
+            extra = '--outSAMtype BAM SortedByCoordinate',
+            index = PATH_STARINDEX
         threads:
             config['star']['threads']
         wrapper:
@@ -188,33 +199,34 @@ if PLATFORM in ['SR', 'sr']:
 if PLATFORM in ['PE', 'pe']:
     rule trimmomatic:
         input:
-            r1 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[0] + '.fastq.gz'),
-            r2 = lambda wildcards: path.join(wildcards.path, wildcards.sample + PREFIX[1] + '.fastq.gz')
+            r1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.fastq.gz'),
+            r2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.fastq.gz')
         output:
-            r1= path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
-            r2= path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
-            r1_unpaired= path.join('{path}', '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz'),
-            r2_unpaired= path.join('{path}', '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz')
+            r1= path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
+            r2= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
+            r1_unpaired= path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz'),
+            r2_unpaired= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz')
         params:
             trimmer = config['trim']['params']['trimmer']
         threads:
             config['trim']['threads']
         log:
-            path.join(PATH_LOG, '{path}', '{sample}.trimmomatic.log')
+            path.join(PATH_LOG, '{sample}.trimmomatic.log')
         wrapper:
             "0.65.0/bio/trimmomatic/pe" # Trim single-end reads
 
     rule star_alignment:
         input:
-           fq1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.trimmed.fastq.gz'),
-           fq2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.trimmed.fastq.gz')
+           fq1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
+           fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
+           index = PATH_STARINDEX
         output:
             PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.sortedByCoord.out.bam'
         log:
             PATH_LOG + '{sample}_star.log'
         params:
-            index = PATH_STARINDEX,
-            extra = '--outSAMtype BAM SortedByCoordinate'
+            extra = '--outSAMtype BAM SortedByCoordinate',
+            index = PATH_STARINDEX
         threads:
             config['star']['threads']
         wrapper:
