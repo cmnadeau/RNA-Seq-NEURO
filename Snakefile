@@ -201,7 +201,7 @@ rule hisat2_alignment:
 
 rule htseq:
     input:
-        bam = PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.out.bam'
+        bam = PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.out.bam',
         gtf = PATH_HTSEQ_GTF
     output:
         PATH_HTSEQ + '{sample}.counts.txt'
@@ -209,7 +209,7 @@ rule htseq:
         others = '--stranded=no --mode=intersection-nonempty -t exon -i gene_id'
     shell:
         """
-        module load HTSeq/0.8.0-foss-2016b-Python-2.7.12
+        module load HTSeq/0.8.0-foss-2016b-Python-2.7.12 & \
         htseq-count {params.others} {input.bam} {input.gtf} > {output}
         """
 
