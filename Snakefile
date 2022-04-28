@@ -14,7 +14,6 @@ PATH_HTSEQ = config['path']['htseq_counts']
 PATH_OUT = config['path']['out']
 
 PATH_HISAT2INDEX = config['hisat2']['index']
-PATH_FASTA = config['hisat2']['fasta']
 PATH_GTF = config['hisat2']['gtf']
 PATH_HTSEQ_GTF = config['htseq']['gtf']
 
