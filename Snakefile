@@ -10,11 +10,13 @@ PATH_TRIMMED = config['path']['trimmed']
 PATH_LOG = config['path']['log']
 PATH_QC = config['path']['qc']
 PATH_BAM = config['path']['bam']
+PATH_HTSEQ = config['path']['htseq_counts']
 PATH_OUT = config['path']['out']
 
-PATH_STARINDEX = config['star']['index']
-PATH_FASTA = config['star']['fasta']
-PATH_GTF = config['star']['gtf']
+PATH_HISAT2INDEX = config['hisat2']['index']
+PATH_FASTA = config['hisat2']['fasta']
+PATH_GTF = config['hisat2']['gtf']
+PATH_HTSEQ_GTF = config['htseq']['gtf']
 
 PLATFORM = config['platform']['SRorPE'] # SE or PE
 PREFIX = config['platform']['prefix']
@@ -87,9 +89,9 @@ rule zip_fastq:
         PATH_OUT + 'compress_fastq.zip'
     shell:
         """
-        zip -j {output} {input} 
+        zip -j {output} {input}
         """
-        
+
 
 rule zip_bams:
     input:
@@ -98,44 +100,44 @@ rule zip_bams:
         PATH_OUT + 'compress_bam.zip'
     shell:
         """
-        zip -j {output} {input} 
+        zip -j {output} {input}
         """
 
-rule star_index:
-    input:
-        fasta=config['star']['fasta_index']
-    output:
-        directory(config['star']['index'])
-    threads:20
-    log:
-        PATH_LOG + "star_index.log"
-    wrapper:
-        "0.65.0/bio/star/index"
-#rule index:
+#rule hisat2_index:
+#    input:
+#        fasta=config['hisat2']['fasta_index']
+#    output:
+#        directory(config['hisat2']['index'])
+#    threads:20
+#    log:
+#        PATH_LOG + "hisat2_index.log"
+#    wrapper:
+#        "0.65.0/bio/hisat2/index"
+##rule index:
 #        input:
-#            fa = config['fa_star'], # provide your reference FASTA file
-#            gtf = config['gtf_star'] # provide your GTF file
-#        output: PATH_STARINDEX
-#        threads: 20 
+#            fa = config['fa_hisat2'], # provide your reference FASTA file
+#            gtf = config['gtf_hisat2'] # provide your GTF file
+#        output: PATH_HISAT2INDEX
+#        threads: 20
 #        shell:"""
-#            STAR --runThreadN {threads} 
-#            --runMode genomeGenerate 
-#            --genomeDir {output} 
-#            --genomeFastaFiles {input.fa} 
-#            --sjdbGTFfile {input.gtf} 
+#            HISAT2 --runThreadN {threads}
+#            --runMode genomeGenerate
+#            --genomeDir {output}
+#            --genomeFastaFiles {input.fa}
+#            --sjdbGTFfile {input.gtf}
 #            --sjdbOverhang 100
 #            # cleanup
-#            rm -rf _STARtmp
-#            mkdir -p log/star
-#            mv Log.out log/star/star_index.log
-#            """        
+#            rm -rf _HISAT2tmp
+#            mkdir -p log/hisat2
+#            mv Log.out log/hisat2/hisat2_index.log
+#            """
 
-rule normalize_counts:
-    input:
-        PATH_OUT + "featurecounts.txt"
-    output:
-        PATH_OUT + "featurecounts.log2.txt"
-    run:
+#rule normalize_counts:#
+#    input:
+#        PATH_OUT + "featurecounts.txt"
+#    output:
+#        PATH_OUT + "featurecounts.log2.txt"
+#    run:
         counts = pd.read_csv(input[0], sep="\t", index_col=list(range(6)), skiprows=1)
         norm_counts = np.log2(normalize_counts(counts) + 1)
         norm_counts.to_csv(output[0], sep="\t", index=True)
@@ -147,95 +149,74 @@ def feature_counts_extra(wildcards):
     return extra
 
 
-rule featurecount:
+#rule featurecount:
+#    input:
+#        expand(PATH_BAM + '{sample}.mq20.bam', sample=RNAIDs)
+#    output:
+#        PATH_OUT + 'featurecounts.txt'
+#    log:
+#        PATH_LOG + 'featurecount_log'
+##    params:
+#        annot = PATH_GTF,
+#        others = feature_counts_extra
+#    shell:
+#        """
+#        featureCounts {params.others} -a {params.annot} -o {output} -T {threads} {input} 2> {log}
+#        """
+
+rule trimmomatic:
     input:
-        expand(PATH_BAM + '{sample}.mq20.bam', sample=RNAIDs)
+        r1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.fastq.gz'),
+        r2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.fastq.gz')
     output:
-        PATH_OUT + 'featurecounts.txt'
-    log:
-        PATH_LOG + 'featurecount_log'
-    threads: config['ftcount']['threads']
+        r1= path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
+        r2= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
+        r1_unpaired= path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz'),
+        r2_unpaired= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz')
     params:
-        annot = PATH_GTF,
-        others = feature_counts_extra 
+        trimmer = config['trim']['params']['trimmer']
+    threads:
+        config['trim']['threads']
+    log:
+        path.join(PATH_LOG, '{sample}.trimmomatic.log')
+    wrapper:
+        "0.65.0/bio/trimmomatic/pe" # Trim single-end reads
+
+rule hisat2_alignment:
+    input:
+       fq1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
+       fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
+       index = PATH_HISAT2INDEX
+    output:
+        PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.out.bam'
+    log:
+        PATH_LOG + '{sample}_hisat2.log'
+    params:
+        extra = '',
+        index = PATH_HISAT2INDEX
+    threads:
+        config['hisat2']['threads']
+    wrapper:
+        "v1.3.2/bio/hisat2/align" # Map PE reads with HISAT2
+
+rule htseq:
+    input:
+        bam = PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.out.bam'
+        gtf = PATH_HTSEQ_GTF
+    output:
+        PATH_HTSEQ + '{sample}.counts.txt'
+    params:
+        others = '--stranded=no --mode=intersection-nonempty -t exon -i gene_id'
     shell:
         """
-        featureCounts {params.others} -a {params.annot} -o {output} -T {threads} {input} 2> {log}
+        module load HTSeq/0.8.0-foss-2016b-Python-2.7.12
+        htseq-count {params.others} {input.bam} {input.gtf} > {output}
         """
-        
-if PLATFORM in ['SR', 'sr']:
-    rule trimmomatic:
-        input:
-            path.join('{path}', '{sample}.fastq.gz')
-        output:
-            path.join('{path}', '{sample}' + '.trimmed.fastq.gz')
-        params:
-            trimmer = config['trim']['params']['trimmer']
-        threads:
-            config['trim']['threads']
-        log:
-            path.join(PATH_LOG, '{sample}.trimmomatic.log')
-        wrapper:
-            "0.65.0/bio/trimmomatic/se" # Trim single-end reads
-
-    rule star_alignment:
-        input:
-            fq1 = lambda wildcards: ID2TrimmedFastq(wildcards.sample, '.trimmed.fastq.gz'),
-            index = PATH_STARINDEX
-        output:
-            PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.sortedByCoord.out.bam'
-        log:
-            PATH_LOG + '{sample}_star.log'
-        params:
-            extra = '--outSAMtype BAM SortedByCoordinate',
-            index = PATH_STARINDEX
-        threads:
-            config['star']['threads']
-        wrapper:
-            "0.65.0/bio/star/align" # Map SR reads with STAR
 
 
-
-if PLATFORM in ['PE', 'pe']:
-    rule trimmomatic:
-        input:
-            r1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.fastq.gz'),
-            r2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.fastq.gz')
-        output:
-            r1= path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
-            r2= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
-            r1_unpaired= path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed_unpaired.fastq.gz'),
-            r2_unpaired= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz')
-        params:
-            trimmer = config['trim']['params']['trimmer']
-        threads:
-            config['trim']['threads']
-        log:
-            path.join(PATH_LOG, '{sample}.trimmomatic.log')
-        wrapper:
-            "0.65.0/bio/trimmomatic/pe" # Trim single-end reads
-
-    rule star_alignment:
-        input:
-           fq1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
-           fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
-           index = PATH_STARINDEX
-        output:
-            PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.sortedByCoord.out.bam'
-        log:
-            PATH_LOG + '{sample}_star.log'
-        params:
-            extra = '--outSAMtype BAM SortedByCoordinate',
-            index = PATH_STARINDEX
-        threads:
-            config['star']['threads']
-        wrapper:
-            "0.65.0/bio/star/align" # Map PE reads with STAR
-
-   
 rule filter_bam:
     input:
-        PATH_BAM+'{sample}/Aligned.sortedByCoord.out.bam'
+        PATH_BAM+'{sample}/Aligned.out.bam'
     output:
         PATH_BAM+'{sample}.mq20.bam'
     params:
@@ -266,7 +247,7 @@ rule multiqc:
 
 rule fastqc_raw:
     input:
-        lambda wildcards: [file for file in Files if wildcards.sample in file] 
+        lambda wildcards: [file for file in Files if wildcards.sample in file]
     output:
         html = path.join(PATH_QC, 'raw', '{sample}.html'),
         zip = path.join(PATH_QC, 'raw', '{sample}_fastqc.zip')
@@ -287,4 +268,4 @@ rule multiqc_raw:
     wrapper:
         '0.65.0/bio/multiqc'
 
-ruleorder: fastqc_raw > star_alignment
+ruleorder: fastqc_raw > hisat2_alignment > htseq

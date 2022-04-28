@@ -4,23 +4,22 @@
 
 platform:
     SRorPE: 'PE' # change to SR if used with single read data
-    prefix: ['_L003_R1', '_L003_R2']
+    prefix: ['_1', '_2']
     # file name pattern, appended before .fastq.gz (*prefix.fastq.gz)
                                    # for paired end, two prefix need to be used
 
 path:
-    fastq: ['/home/y.kim1/Projects/RNAseqDeconvolution/PBMCInhouse/data']
-    trimmed: 'data/trimmed/'
-    log: 'log/'
-    qc: 'outcome/qc/'
-    bam: 'outcome/bams/'
-    out: 'outcome/output/'
+    fastq: ['/home/shared/inbre-group1/Bioinformatics-NEURO/data']
+    trimmed: 'results/intermediate_results/intermediate_results/trimmomatic'
+    log: 'results/intermediate_results/logs/'
+    qc: 'results/intermediate_results/fastqc'
+    bam: 'results/intermediate_results/alignment'
+    htseq_counts: 'results/intermediate_results/htseq'
+    out: 'results/final_results'
 
 ##############################################
 ############ Software options ################
 ##############################################
-index:
-    threads: 20 # set the maximum number of available core
 
 ftcount:
     threads: 20
@@ -28,20 +27,20 @@ ftcount:
 
 trim:
     params:
-        trimmer: ["ILLUMINACLIP:/net/nfs/PAT/archive/Resource/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10"] # Cut bases off the end of a read, if below a threshold quality; use LEADING for begining
-    threads: 10 
+        trimmer: ["ILLUMINACLIP:/home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/Trimmomatic/TruSeq3-PE.fa:2:30:10"] # Cut bases off the end of a read, if below a threshold quality; use LEADING for begining
+    threads: 16
     #For more options check the manual @ http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf
 
-star:
-    threads: 15
-    index: '/net/nfs/PAT/archive/Resource/STAR_index/GRCh37.75/'
-    fasta: 'STARindex/fasta/'
-    fasta_index: '/net/nfs/PAT/archive/Resource/fasta/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa'
-    gtf: '/net/nfs/PAT/archive/Resource/gtf/Homo_sapiens.GRCh37.75.gtf'
+hisat2:
+    threads: 16
+    index: '/home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/new_genome/index.2/chm13v2.0'
+    gtf: '/home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/new_genome/CHM13.v2.0.gtf'
 
 bam:
-    params: '-b -h -q20' 
+    params: '-b -h -q20'
     #-b Output in the BAM format.
     #-h Include the header in the output.
     #-qINT Skip alignments with MAPQ smaller than INT [0]
     #For more options check the manual @ http://www.htslib.org/doc/samtools.html
+htseq:
+    gtf: /home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/new_genome/CHM13.v2.0.gtf'
