@@ -79,7 +79,7 @@ rule all:
         PATH_OUT + 'multiqc.html',
         PATH_OUT + 'multiqc_raw.html',
         PATH_OUT + 'compress_fastq.zip',
-        PATH_OUT + 'compress_bam.zip'
+        PATH_OUT + 'compress_bam.zip',
         PATH_OUT + 'bam_zipped.zip'
 
 rule zip_fastq:
