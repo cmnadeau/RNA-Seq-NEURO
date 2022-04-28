@@ -211,7 +211,10 @@ rule hisat2_alignment:
 #        module load HTSeq/0.8.0-foss-2016b-Python-2.7.12 & \
 #        htseq-count {params.others} {input.bam} {input.gtf} > {output}
 #        """
-
+rule zip_aligned:
+    input: expand(PATH_BAM+'{sample}/Aligned.out.bam', sample=RNAIDs)
+    output: PATH_OUT+'bam_zipped.zip'
+    shell: "zip -j {output} {input}"
 
 rule filter_bam:
     input:
