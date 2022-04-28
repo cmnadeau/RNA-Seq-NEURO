@@ -2,7 +2,7 @@
 
 [![Snakemake](https://img.shields.io/badge/snakemake==5.25.0-brightgreen.svg?style=flat-square)](https://snakemake.bitbucket.io) [![miniconda](https://img.shields.io/badge/install%20with-conda-green.svg)](https://docs.conda.io/en/latest/miniconda.html)
 
-This is an altered [Snakemake](https://snakemake.readthedocs.io/en/stable/) based pipeline for RNA-seq originally in the [Tumor Genome Core Analysis](http://www.tgac.nl/) housed in the [Cancer Center Amsterdam](https://www.vumc.com/departments/cancer-center-amsterdam.htm), at [Amsterdam UMC location VUmc](https://www.vumc.nl/) and part of the Department of Pathology.
+This is an altered [Snakemake](https://snakemake.readthedocs.io/en/stable/) based pipeline for RNA-seq originally in the [Tumor Genome Core Analysis](http://www.tgac.nl/) housed in the [Cancer Center Amsterdam](https://www.vumc.com/departments/cancer-center-amsterdam.htm), at [Amsterdam UMC location VUmc](https://www.vumc.nl/) and part of the Department of Pathology for use with RNA-Seq data for Alzheimer's and Parkinson's disease.
 
 The pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)), aligns the reads ([HISAT2](http://daehwankimlab.github.io/hisat2/)), generates gene counts ([HTSeq/DESeq2](https://htseq.readthedocs.io/en/master/)) and performs quality-control on the results ([MultiQC](https://multiqc.info/)). Paired-end (PE) and single read (SR) are supported.
 
