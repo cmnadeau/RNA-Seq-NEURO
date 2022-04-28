@@ -267,4 +267,4 @@ rule multiqc_raw:
     wrapper:
         '0.65.0/bio/multiqc'
 
-ruleorder: fastqc_raw > hisat2_alignment > htseq
+ruleorder: fastqc_raw > hisat2_alignment
