@@ -26,7 +26,7 @@ for p in PATH_FASTQ:
     if PLATFORM in ['SR', 'sr']:
         for prefix in PREFIX:
             NewFile = glob.glob(path.join(p, '*'+prefix+'.fastq.gz'))
-            if not prefix is '':
+            if prefix != '':
                 RNAIDs = RNAIDs + [f.split('/')[-1].split(prefix)[0] for f in NewFile]
             else:
                 RNAIDs = RNAIDs + [f.split('/')[-1].split('.fastq.gz')[0] for f in NewFile]
