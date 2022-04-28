@@ -188,7 +188,7 @@ rule hisat2_alignment:
        fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
        index = PATH_HISAT2INDEX
     output:
-        PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.out.bam'
+        PATH_BAM + '{sample}/Aligned.out.bam'
     log:
         PATH_LOG + '{sample}_hisat2.log'
     params:
