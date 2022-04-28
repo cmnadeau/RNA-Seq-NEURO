@@ -75,7 +75,7 @@ def ID2FastqPath(ID):
 
 rule all:
     input:
-        PATH_OUT + 'featurecounts.log2.txt',
+        #PATH_OUT + 'featurecounts.log2.txt',
         PATH_OUT + 'multiqc.html',
         PATH_OUT + 'multiqc_raw.html',
         PATH_OUT + 'compress_fastq.zip',
