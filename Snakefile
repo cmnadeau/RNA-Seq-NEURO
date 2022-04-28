@@ -198,19 +198,19 @@ rule hisat2_alignment:
     wrapper:
         "v1.3.2/bio/hisat2/align" # Map PE reads with HISAT2
 
-rule htseq:
-    input:
-        bam = PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.out.bam',
-        gtf = PATH_HTSEQ_GTF
-    output:
-        PATH_HTSEQ + '{sample}.counts.txt'
-    params:
-        others = '--stranded=no --mode=intersection-nonempty -t exon -i gene_id'
-    shell:
-        """
-        module load HTSeq/0.8.0-foss-2016b-Python-2.7.12 & \
-        htseq-count {params.others} {input.bam} {input.gtf} > {output}
-        """
+#rule htseq:
+#    input:
+#        bam = PATH_BAM + '{sample, [0-9a-zA-Z_-]+}/Aligned.out.bam',
+#        gtf = PATH_HTSEQ_GTF
+#    output:
+#        PATH_HTSEQ + '{sample}.counts.txt'
+#    params:
+#        others = '--stranded=no --mode=intersection-nonempty -t exon -i gene_id'
+#    shell:
+#        """
+#        module load HTSeq/0.8.0-foss-2016b-Python-2.7.12 & \
+#        htseq-count {params.others} {input.bam} {input.gtf} > {output}
+#        """
 
 
 rule filter_bam:
