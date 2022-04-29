@@ -172,7 +172,7 @@ rule trimmomatic:
         path.join(PATH_LOG, '{sample}.trimmomatic.log')
     shell:
         """
-        java -jar $EBROOTTRIMMOMATIC/trimmomatic-0.39.jar PE {input.fq1} {input.fq2} {output.r1} {output.r1_unpaired} \
+        java -jar $EBROOTTRIMMOMATIC/trimmomatic-0.39.jar PE {input.r1} {input.r2} {output.r1} {output.r1_unpaired} \
         {output.r2} {output.r2_unpaired} {params.trimmer} -threads {threads}
         """
 #    wrapper:
