@@ -157,8 +157,8 @@ rule zip_bams:
 
 rule trimmomatic:
     input:
-        r1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.fastq.gz'),
-        r2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.fastq.gz')
+        r1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.fastq'),
+        r2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.fastq')
     output:
         r1= path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
         r2= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
