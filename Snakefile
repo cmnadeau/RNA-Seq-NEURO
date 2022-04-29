@@ -166,14 +166,13 @@ rule trimmomatic:
         r2_unpaired= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed_unpaired.fastq.gz')
     params:
         trimmer = config['trim']['params']['trimmer']
-    threads:
         t = config['trim']['threads']
     log:
         path.join(PATH_LOG, '{sample}.trimmomatic.log')
     shell:
         """
         java -jar $EBROOTTRIMMOMATIC/trimmomatic-0.39.jar PE {input.fq1} {input.fq2} {output.r1} {output.r1_unpaired} \
-        {output.r2} {output.r2_unpaired} {params.trimmer} -threads {threads.t}
+        {output.r2} {output.r2_unpaired} {params.trimmer} -threads {params.t}
         """
 #    wrapper:
 #        "v1.3.2/bio/trimmomatic/pe" # Trim paired-end reads
