@@ -10,12 +10,12 @@ platform:
 
 path:
     fastq: ['/home/shared/inbre-group1/Bioinformatics-NEURO/data']
-    trimmed: 'results/intermediate_results/intermediate_results/trimmomatic/'
-    log: 'results/logs/'
-    qc: 'results/intermediate_results/fastqc/'
-    bam: 'results/intermediate_results/alignment/'
-    htseq_counts: 'results/intermediate_results/htseq/'
-    out: 'results/final_results/'
+    trimmed: '/home/shared/inbre-group1/Bioinformatics-NEURO/results/intermediate_results/intermediate_results/trimmomatic/'
+    log: '/home/shared/inbre-group1/Bioinformatics-NEURO/results/logs/'
+    qc: '/home/shared/inbre-group1/Bioinformatics-NEURO/results/intermediate_results/fastqc/'
+    bam: '/home/shared/inbre-group1/Bioinformatics-NEURO/results/intermediate_results/alignment/'
+    htseq_counts: '/home/shared/inbre-group1/Bioinformatics-NEURO/results/intermediate_results/htseq/'
+    out: '/home/shared/inbre-group1/Bioinformatics-NEURO/results/final_results/'
 
 ##############################################
 ############ Software options ################
