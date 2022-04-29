@@ -23,8 +23,8 @@ PREFIX = config['platform']['prefix']
 Files = []
 RNAIDs = []
 for p in PATH_FASTQ:
-    R1 = glob.glob(path.join(p, '*'+PREFIX[0]+'.fastq.gz'))
-    R2 = glob.glob(path.join(p, '*'+PREFIX[1]+'.fastq.gz'))
+    R1 = glob.glob(path.join(p, '*'+PREFIX[0]+'.fastq'))
+    R2 = glob.glob(path.join(p, '*'+PREFIX[1]+'.fastq'))
     ID_R1 = [f.split('/')[-1].split(PREFIX[0])[0] for f in R1]
     ID_R2 = [f.split('/')[-1].split(PREFIX[1])[0] for f in R2]
     if not set(ID_R1) == set(ID_R2):
@@ -36,7 +36,7 @@ for p in PATH_FASTQ:
 RNAIDs = list(set(RNAIDs))
 print(RNAIDs)
 def ID2TrimmedFastq(ID, EXT):
-   return [re.sub(".fastq.gz", "", file) + EXT for file in Files if ID in file]
+   return [re.sub(".fastq", "", file) + EXT for file in Files if ID in file]
 
 def ID2FastqPath(ID):
     return '/'.join([s for s in Files if ID in s][0].split('/')[:-1])
