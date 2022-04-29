@@ -176,8 +176,7 @@ rule trimmomatic:
 rule hisat2_alignment:
     input:
        fq1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
-       fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
-       index = PATH_HISAT2INDEX
+       fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')
     output:
         PATH_BAM + '{sample}/Aligned.out.bam'
     log:
