@@ -167,11 +167,16 @@ rule trimmomatic:
     params:
         trimmer = config['trim']['params']['trimmer']
     threads:
-        config['trim']['threads']
+        t = config['trim']['threads']
     log:
         path.join(PATH_LOG, '{sample}.trimmomatic.log')
-    wrapper:
-        "v1.3.2/bio/trimmomatic/pe" # Trim paired-end reads
+    shell:
+        """
+        java -jar $EBROOTTRIMMOMATIC/trimmomatic-0.39.jar PE {input.fq1} {input.fq2} {output.r1} {output.r1_unpaired} \
+        {output.r2} {output.r2_unpaired} {params.trimmer} -threads {threads.t}
+        """
+#    wrapper:
+#        "v1.3.2/bio/trimmomatic/pe" # Trim paired-end reads
 
 rule hisat2_alignment:
     input:
