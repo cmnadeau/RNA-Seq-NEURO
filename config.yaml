@@ -28,7 +28,7 @@ ftcount:
 trim:
     params:
         trimmer: ["ILLUMINACLIP:/home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/Trimmomatic/TruSeq3-PE.fa:2:30:10"] # Cut bases off the end of a read, if below a threshold quality; use LEADING for begining
-    threads: 16
+    threads: 10
     #For more options check the manual @ http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf
 
 hisat2:
