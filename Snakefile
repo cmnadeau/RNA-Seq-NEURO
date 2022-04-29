@@ -171,7 +171,7 @@ rule trimmomatic:
     log:
         path.join(PATH_LOG, '{sample}.trimmomatic.log')
     wrapper:
-        "0.65.0/bio/trimmomatic/pe" # Trim single-end reads
+        "v1.3.2/bio/trimmomatic/pe" # Trim paired-end reads
 
 rule hisat2_alignment:
     input:
