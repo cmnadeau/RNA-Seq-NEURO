@@ -23,8 +23,8 @@ PREFIX = config['platform']['prefix']
 Files = []
 RNAIDs = []
 for p in PATH_FASTQ:
-    R1 = glob.glob(path.join(p, '*'+PREFIX[0]+'.fastq'))
-    R2 = glob.glob(path.join(p, '*'+PREFIX[1]+'.fastq'))
+    R1 = glob.glob(path.join(p, '*'+PREFIX[0]+'.fastq.gz'))
+    R2 = glob.glob(path.join(p, '*'+PREFIX[1]+'.fastq.gz'))
     ID_R1 = [f.split('/')[-1].split(PREFIX[0])[0] for f in R1]
     ID_R2 = [f.split('/')[-1].split(PREFIX[1])[0] for f in R2]
     if not set(ID_R1) == set(ID_R2):
@@ -36,7 +36,7 @@ for p in PATH_FASTQ:
 RNAIDs = list(set(RNAIDs))
 print(RNAIDs)
 def ID2TrimmedFastq(ID, EXT):
-   return [re.sub(".fastq", "", file) + EXT for file in Files if ID in file]
+   return [re.sub(".fastq.gz", "", file) + EXT for file in Files if ID in file]
 
 def ID2FastqPath(ID):
     return '/'.join([s for s in Files if ID in s][0].split('/')[:-1])
@@ -157,8 +157,8 @@ rule zip_bams:
 
 rule trimmomatic:
     input:
-        r1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.fastq'),
-        r2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.fastq')
+        r1 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[0] + '.fastq.gz'),
+        r2 = lambda wildcards: path.join(ID2FastqPath(wildcards.sample), wildcards.sample + PREFIX[1] + '.fastq.gz')
     output:
         r1= path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
         r2= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz'),
