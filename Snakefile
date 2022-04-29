@@ -23,24 +23,15 @@ PREFIX = config['platform']['prefix']
 Files = []
 RNAIDs = []
 for p in PATH_FASTQ:
-    if PLATFORM in ['SR', 'sr']:
-        for prefix in PREFIX:
-            NewFile = glob.glob(path.join(p, '*'+prefix+'.fastq.gz'))
-            if prefix != '':
-                RNAIDs = RNAIDs + [f.split('/')[-1].split(prefix)[0] for f in NewFile]
-            else:
-                RNAIDs = RNAIDs + [f.split('/')[-1].split('.fastq.gz')[0] for f in NewFile]
-            Files = Files + NewFile
-    if PLATFORM in ['PE', 'pe']:
-        R1 = glob.glob(path.join(p, '*'+PREFIX[0]+'.fastq.gz'))
-        R2 = glob.glob(path.join(p, '*'+PREFIX[1]+'.fastq.gz'))
-        ID_R1 = [f.split('/')[-1].split(PREFIX[0])[0] for f in R1]
-        ID_R2 = [f.split('/')[-1].split(PREFIX[1])[0] for f in R2]
-        if not set(ID_R1) == set(ID_R2):
-            Mismatch = list(set(ID_R1)-set(ID_R2)) + list(set(ID_R2)-set(ID_R1))
-            raise Exception("Missing pairs: " + ' '.join(Mismatch))
-        RNAIDs = RNAIDs + ID_R1
-        Files = Files + R1 + R2
+    R1 = glob.glob(path.join(p, '*'+PREFIX[0]+'.fastq.gz'))
+    R2 = glob.glob(path.join(p, '*'+PREFIX[1]+'.fastq.gz'))
+    ID_R1 = [f.split('/')[-1].split(PREFIX[0])[0] for f in R1]
+    ID_R2 = [f.split('/')[-1].split(PREFIX[1])[0] for f in R2]
+    if not set(ID_R1) == set(ID_R2):
+        Mismatch = list(set(ID_R1)-set(ID_R2)) + list(set(ID_R2)-set(ID_R1))
+        raise Exception("Missing pairs: " + ' '.join(Mismatch))
+    RNAIDs = RNAIDs + ID_R1
+    Files = Files + R1 + R2
 
 RNAIDs = list(set(RNAIDs))
 print(RNAIDs)
