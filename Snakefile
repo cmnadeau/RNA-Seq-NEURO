@@ -173,7 +173,7 @@ rule trimmomatic:
     shell:
         """
         java -jar $EBROOTTRIMMOMATIC/trimmomatic-0.39.jar PE {input.r1} {input.r2} {output.r1} {output.r1_unpaired} \
-        {output.r2} {output.r2_unpaired} {params.trimmer} -threads {threads}
+        {output.r2} {output.r2_unpaired} {params.trimmer} -threads {threads} > {log}
         """
 #    wrapper:
 #        "v1.3.2/bio/trimmomatic/pe" # Trim paired-end reads
