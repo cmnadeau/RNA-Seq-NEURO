@@ -177,7 +177,7 @@ rule trimmomatic:
         """
 #    wrapper:
 #        "v1.3.2/bio/trimmomatic/pe" # Trim paired-end reads
-rule unzip_trim
+rule unzip_trim:
     input:
         r1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
         r2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')
@@ -195,7 +195,7 @@ rule hisat2_alignment:
     output:
         PATH_BAM + '{sample}/Aligned.out.bam'
     log:
-        PATH_LOG + '{sample}_hisat2.log'
+        PATH_LOG + '/align/{sample}_hisat2.log'
     params:
         extra = '',
         index = PATH_HISAT2INDEX
