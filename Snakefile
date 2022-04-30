@@ -169,7 +169,7 @@ rule trimmomatic:
     threads:
         config['trim']['threads']
     log:
-        PATH_LOG + '/trimmomatic/{sample}.trimmomatic.log'
+        PATH_LOG + 'trimmomatic/{sample}.trimmomatic.log'
     shell:
         """
         java -jar $EBROOTTRIMMOMATIC/trimmomatic-0.39.jar PE {input.r1} {input.r2} {output.r1} {output.r1_unpaired} \
@@ -195,7 +195,7 @@ rule hisat2_alignment:
     output:
         PATH_BAM + '{sample}/Aligned.out.bam'
     log:
-        PATH_LOG + '/align/{sample}_hisat2.log'
+        PATH_LOG + 'align/{sample}_hisat2.log'
     params:
         extra = '',
         index = PATH_HISAT2INDEX
