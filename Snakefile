@@ -262,7 +262,7 @@ rule fastqc_raw:
     log:
         path.join(PATH_QC, '{sample}.fastqc')
     wrapper:
-        '0.65.0/bio/fastqc'
+        'v1.3.2/bio/fastqc'
 
 rule multiqc_raw:
     input:
