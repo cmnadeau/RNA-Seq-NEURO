@@ -169,7 +169,7 @@ rule trimmomatic:
     threads:
         config['trim']['threads']
     log:
-        PATH_LOG + '/trimmomatic/{sample}.trimmomatic.log')
+        PATH_LOG + '/trimmomatic/{sample}.trimmomatic.log'
     shell:
         """
         java -jar $EBROOTTRIMMOMATIC/trimmomatic-0.39.jar PE {input.r1} {input.r2} {output.r1} {output.r1_unpaired} \
