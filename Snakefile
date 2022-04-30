@@ -169,7 +169,7 @@ rule trimmomatic:
     threads:
         config['trim']['threads']
     log:
-        path.join(PATH_LOG, '{sample}.trimmomatic.log')
+        path.join(PATH_LOG, '/trimmomatic/{sample}.trimmomatic.log')
     shell:
         """
         java -jar $EBROOTTRIMMOMATIC/trimmomatic-0.39.jar PE {input.r1} {input.r2} {output.r1} {output.r1_unpaired} \
@@ -177,11 +177,21 @@ rule trimmomatic:
         """
 #    wrapper:
 #        "v1.3.2/bio/trimmomatic/pe" # Trim paired-end reads
-
+rule unzip_trim
+    input:
+        r1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
+        r2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')
+    output:
+        ur1= path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq'),
+        ur2= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq')
+    shell:
+        """
+        gunzip -fk {input.r1} {input.r2}
+        """
 rule hisat2_alignment:
     input:
-       fq1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq.gz'),
-       fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq.gz')
+       fq1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq'),
+       fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq')
     output:
         PATH_BAM + '{sample}/Aligned.out.bam'
     log:
