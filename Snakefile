@@ -186,7 +186,7 @@ rule unzip_trim:
         ur2= path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq')
     shell:
         """
-        gunzip -fk {input.r1} {input.r2}
+        gunzip -f {input.r1} {input.r2}
         """
 rule hisat2_alignment:
     input:
