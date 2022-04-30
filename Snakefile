@@ -201,8 +201,16 @@ rule hisat2_alignment:
         index = PATH_HISAT2INDEX
     threads:
         config['hisat2']['threads']
-    wrapper:
-        "v1.3.2/bio/hisat2/align" # Map PE reads with HISAT2
+    shell:
+        """
+        hisat2 \
+        --threads {threads} \
+        -x {params.index} \
+        -1 {input.fq1} \
+        -2 {input.fq2}
+        """
+#    wrapper:#
+#        "v1.3.2/bio/hisat2/align" # Map PE reads with HISAT2
 
 #rule htseq:
 #    input:
