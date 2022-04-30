@@ -207,7 +207,7 @@ rule hisat2_alignment:
         --threads {threads} \
         -x {params.index} \
         -1 {input.fq1} \
-        -2 {input.fq2}
+        -2 {input.fq2} > {output}
         """
 #    wrapper:#
 #        "v1.3.2/bio/hisat2/align" # Map PE reads with HISAT2
