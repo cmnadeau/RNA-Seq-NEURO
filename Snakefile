@@ -67,8 +67,8 @@ def ID2FastqPath(ID):
 rule all:
     input:
         #PATH_OUT + 'featurecounts.log2.txt',
-        PATH_OUT + 'multiqc.html',
-        PATH_OUT + 'multiqc_raw.html',
+#        PATH_OUT + 'multiqc.html',
+#        PATH_OUT + 'multiqc_raw.html',
         PATH_OUT + 'compress_fastq.zip',
         PATH_OUT + 'compress_bam.zip',
         PATH_OUT + 'bam_zipped.zip'
@@ -251,15 +251,15 @@ rule fastqc_fastq:
     wrapper:
         "0.65.0/bio/fastqc" # generates fastq qc statistics; quality control tool for high throughput sequence data
 
-rule multiqc:
-    input:
-        expand(PATH_QC+"{sample}_fastqc.zip", sample=RNAIDs)
-    output:
-        PATH_OUT+'multiqc.html'
-    log:
-        PATH_LOG+'multiqc.log'
-    wrapper:
-        '0.65.0/bio/multiqc' # modular tool to aggregate results from bioinformatics analyses across many samples into a single report
+#rule multiqc:
+#    input:
+#        expand(PATH_QC+"{sample}_fastqc.zip", sample=RNAIDs)
+#    output:
+#        PATH_OUT+'multiqc.html'
+#    log:
+#        PATH_LOG+'multiqc.log'
+#    wrapper:
+#        '0.65.0/bio/multiqc' # modular tool to aggregate results from bioinformatics analyses across many samples into a single report
 
 rule fastqc_raw:
     input:
@@ -272,16 +272,16 @@ rule fastqc_raw:
     wrapper:
         'v1.3.2/bio/fastqc'
 
-rule multiqc_raw:
-    input:
-        lambda wildcards: [path.join(PATH_QC, 'raw', \
-            file.split('/')[-1].split('.fastq.gz')[0] + '_fastqc.zip') \
-            for file in Files]
-    output:
-        PATH_OUT+'multiqc_raw.html'
-    log:
-        PATH_LOG+'multiqc_raw.log'
-    wrapper:
-        '0.65.0/bio/multiqc'
+#rule multiqc_raw:
+#    input:
+#        lambda wildcards: [path.join(PATH_QC, 'raw', \
+#            file.split('/')[-1].split('.fastq.gz')[0] + '_fastqc.zip') \
+#            for file in Files]
+#    output:
+#        PATH_OUT+'multiqc_raw.html'
+#    log:
+#        PATH_LOG+'multiqc_raw.log'
+#    wrapper:
+#        '0.65.0/bio/multiqc'
 
 ruleorder: fastqc_raw > hisat2_alignment
