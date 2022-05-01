@@ -94,15 +94,15 @@ rule zip_bams:
         """
         zip -j {output} {input}
         """
-rule zip_htseq:
-    input:
-        expand(PATH_HTSEQ + '{sample}.counts.txt')
-    output:
-        PATH_OUT + 'htseq_out.zip'
-    shell:
-        """
-        zip -j {output} {input}
-        """
+#rule zip_htseq:
+#    input:
+#        expand(PATH_HTSEQ + '{sample}.counts.txt')
+#    output:
+#        PATH_OUT + 'htseq_out.zip'
+#    shell:
+#        """
+#        zip -j {output} {input}
+#        """
 #rule hisat2_index:
 #    input:
 #        fasta=config['hisat2']['fasta_index']
@@ -221,18 +221,17 @@ rule hisat2_alignment:
 #    wrapper:#
 #        "v1.3.2/bio/hisat2/align" # Map PE reads with HISAT2
 
-rule htseq:
-    input:
-        bam = PATH_BAM + '{sample}/Aligned.out.bam'
-    output:
-        PATH_HTSEQ + '{sample}.counts.txt'
-    params:
-        others = '--stranded=no --mode=intersection-nonempty -r pos',
-        gtf = PATH_HTSEQ_GTF
-    shell:
-        """
-        htseq-count {params.others} {input.bam} {params.gtf} > {output}
-        """
+#rule htseq:
+#    input:
+#        bam = PATH_BAM + '{sample}/Aligned.out.bam'
+#    output:
+#        PATH_HTSEQ + '{sample}.counts.txt'
+#        others = '--stranded=no --mode=intersection-nonempty -r pos',
+#        gtf = PATH_HTSEQ_GTF
+#    shell:
+#        """
+#        htseq-count {params.others} {input.bam} {params.gtf} > {output}
+#        """
 rule zip_aligned:
     input: expand(PATH_BAM+'{sample}/Aligned.out.bam', sample=RNAIDs)
     output: PATH_OUT+'bam_zipped.zip'
