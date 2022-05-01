@@ -71,8 +71,8 @@ rule all:
 #        PATH_OUT + 'multiqc_raw.html',
         PATH_OUT + 'compress_fastq.zip',
         PATH_OUT + 'compress_bam.zip',
-        PATH_OUT + 'bam_zipped.zip',
-        PATH_OUT + 'htseq_out.zip'
+        PATH_OUT + 'bam_zipped.zip'
+        #PATH_OUT + 'htseq_out.zip'
 
 rule zip_fastq:
     input:
