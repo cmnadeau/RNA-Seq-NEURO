@@ -202,7 +202,7 @@ rule hisat2_alignment:
        fq1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq'),
        fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq')
     output:
-        PATH_BAM + '{sample}/Aligned.out.bam'
+        PATH_BAM + '{sample}/{sample}.Aligned.out.bam'
     log:
         PATH_LOG + 'align/{sample}_hisat2.log'
     params:
