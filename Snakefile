@@ -95,7 +95,7 @@ rule zip_bams:
         """
 rule zip_counts:
     input:
-        expand(PATH_HTSEQ + '{sample}.counts.txt')
+        expand(PATH_HTSEQ + '{sample}.counts.txt', sample=RNAIDs)
     output:
         PATH_OUT + 'counts_out.zip'
     shell:
