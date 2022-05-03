@@ -71,7 +71,7 @@ rule all:
 #        PATH_OUT + 'multiqc_raw.html',
         PATH_OUT + 'compress_fastq.zip',
         PATH_OUT + 'compress_bam.zip',
-        PATH_OUT + 'counts_out.zip'
+#        PATH_OUT + 'counts_out.zip'
 
 rule zip_fastq:
     input:
@@ -93,15 +93,15 @@ rule zip_bams:
         """
         zip -j {output} {input}
         """
-rule zip_counts:
-    input:
-        expand(PATH_HTSEQ + '{sample}.counts.txt')
-    output:
-        PATH_OUT + 'counts_out.zip'
-    shell:
-        """
-        zip -j {output} {input}
-        """
+#rule zip_counts:
+#    input:
+#        expand(PATH_HTSEQ + '{sample}.counts.txt')
+#    output:
+#        PATH_OUT + 'counts_out.zip'
+#    shell:
+#        """
+#        zip -j {output} {input}
+#        """
 #rule hisat2_index:
 #    input:
 #        fasta=config['hisat2']['fasta_index']
@@ -225,18 +225,18 @@ rule hisat2_alignment:
 #    wrapper:#
 #        "v1.3.2/bio/hisat2/align" # Map PE reads with HISAT2
 
-rule featureCounts:
-    input:
-        bam = PATH_BAM + '{sample}.sorted.out.bam'
-    output:
-        PATH_HTSEQ + '{sample}.counts.txt'
-    params:
-        others = '-p -t exon -g gene_id',
-        gtf = PATH_HTSEQ_GTF
-    shell:
-        """
-        featureCounts {params.others} -a {params.gtf} -o {output} {input.bam}
-        """
+#rule featureCounts:
+#    input:
+#        bam = PATH_BAM + '{sample}.sorted.out.bam'
+#    output:
+#        PATH_HTSEQ + '{sample}.counts.txt'
+#    params:
+#        others = '-p -t exon -g gene_id',
+#        gtf = PATH_HTSEQ_GTF
+#    shell:
+#        """
+#        featureCounts {params.others} -a {params.gtf} -o {output} {input.bam}
+#        """
 
 
 
