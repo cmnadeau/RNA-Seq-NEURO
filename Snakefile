@@ -202,8 +202,8 @@ rule hisat2_alignment:
        fq1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq'),
        fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq')
     output:
-        bam = PATH_BAM + '{sample}.sorted.out.bam'
-        sum = PATH_LOG + '{sample}_sum.txt'
+        bam = PATH_BAM + '{sample}.sorted.out.bam',
+        sum = PATH_LOG + '{sample}_sum.txt',
         met = PATH_LOG + '{sample}_met.txt'
     log:
         PATH_LOG + 'align/{sample}_hisat2.log'
@@ -240,8 +240,8 @@ rule featureCounts:
         """
 
 rule zip_aligned:
-    input: expand(PATH_BAM+'{sample}/Aligned.out.bam', sample=RNAIDs)
-    output: PATH_OUT+'bam_zipped.zip'
+    input: expand(PATH_BAM+'{sample}/Aligned.out.bam', sample=RNAIDs),
+    output: PATH_OUT+'bam_zipped.zip',
     shell: "zip -j {output} {input}"
 
 rule fastqc_fastq:
