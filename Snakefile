@@ -217,7 +217,7 @@ rule hisat2_alignment:
         --threads {threads} \
         -x {params.index} \
         --summary-file {output.sum} \
-        --met-file {output.met}
+        --met-file {output.met} \
         -1 {input.fq1} \
         -2 {input.fq2} | \
         samtools sort -T {threads} -o {output.bam}
