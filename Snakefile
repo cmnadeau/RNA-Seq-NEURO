@@ -228,7 +228,7 @@ rule hisat2_alignment:
 
 rule featureCounts:
     input:
-        bam = PATH_BAM + '{sample}/Aligned.out.bam'
+        bam = PATH_BAM + '{sample}/sorted.out.bam'
     output:
         PATH_HTSEQ + '{sample}.counts.txt'
     params:
