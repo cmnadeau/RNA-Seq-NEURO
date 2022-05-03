@@ -71,7 +71,6 @@ rule all:
 #        PATH_OUT + 'multiqc_raw.html',
         PATH_OUT + 'compress_fastq.zip',
         PATH_OUT + 'compress_bam.zip',
-        #PATH_OUT + 'bam_zipped.zip'
         PATH_OUT + 'counts_out.zip'
 
 rule zip_fastq:
@@ -87,7 +86,7 @@ rule zip_fastq:
 
 rule zip_bams:
     input:
-        expand(PATH_BAM + '{sample}.Aligned.out.bam', sample=RNAIDs)
+        expand(PATH_BAM + '{sample}.sorted.out.bam', sample=RNAIDs)
     output:
         PATH_OUT + 'compress_bam.zip'
     shell:
@@ -228,7 +227,7 @@ rule hisat2_alignment:
 
 rule featureCounts:
     input:
-        bam = PATH_BAM + '{sample}/sorted.out.bam'
+        bam = PATH_BAM + '{sample}.sorted.out.bam'
     output:
         PATH_HTSEQ + '{sample}.counts.txt'
     params:
@@ -239,14 +238,11 @@ rule featureCounts:
         featureCounts {params.others} -a {params.gtf} -o {output} {input.bam}
         """
 
-rule zip_aligned:
-    input: expand(PATH_BAM+'{sample}/Aligned.out.bam', sample=RNAIDs),
-    output: PATH_OUT+'bam_zipped.zip',
-    shell: "zip -j {output} {input}"
+
 
 rule fastqc_fastq:
     input:
-        PATH_BAM + '{sample}.mq20.bam'
+        PATH_BAM + '{sample}.sorted.out.bam'
     output:
         html=PATH_QC+"{sample}_fastqc.html",
         zip=PATH_QC+"{sample}_fastqc.zip"
