@@ -33,7 +33,7 @@ trim:
 
 hisat2:
     threads: 16
-    index: '/home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/new_genome/index.2/chm13v2.0'
+    index: '/home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/grch38/genome'
     gtf: '/home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/new_genome/CHM13.v2.0.gtf'
 
 bam:
@@ -43,4 +43,4 @@ bam:
     #-qINT Skip alignments with MAPQ smaller than INT [0]
     #For more options check the manual @ http://www.htslib.org/doc/samtools.html
 htseq:
-    gtf: /home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/new_genome/CHM13.v2.0.gtf'
+    gtf: /home/shared/inbre-group1/Bioinformatics-NEURO/pipeline/grch38/Homo_sapiens.GRCh38.90.chr.gtf'

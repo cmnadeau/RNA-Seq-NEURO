@@ -71,8 +71,8 @@ rule all:
 #        PATH_OUT + 'multiqc_raw.html',
         PATH_OUT + 'compress_fastq.zip',
         PATH_OUT + 'compress_bam.zip',
-        PATH_OUT + 'bam_zipped.zip'
-        #PATH_OUT + 'htseq_out.zip'
+        #PATH_OUT + 'bam_zipped.zip'
+        PATH_OUT + 'counts_out.zip'
 
 rule zip_fastq:
     input:
@@ -87,22 +87,22 @@ rule zip_fastq:
 
 rule zip_bams:
     input:
-        expand(PATH_BAM + '{sample}.mq20.bam', sample=RNAIDs)
+        expand(PATH_BAM + '{sample}.Aligned.out.bam', sample=RNAIDs)
     output:
         PATH_OUT + 'compress_bam.zip'
     shell:
         """
         zip -j {output} {input}
         """
-#rule zip_htseq:
-#    input:
-#        expand(PATH_HTSEQ + '{sample}.counts.txt')
-#    output:
-#        PATH_OUT + 'htseq_out.zip'
-#    shell:
-#        """
-#        zip -j {output} {input}
-#        """
+rule zip_counts:
+    input:
+        expand(PATH_HTSEQ + '{sample}.counts.txt')
+    output:
+        PATH_OUT + 'counts_out.zip'
+    shell:
+        """
+        zip -j {output} {input}
+        """
 #rule hisat2_index:
 #    input:
 #        fasta=config['hisat2']['fasta_index']
@@ -202,7 +202,9 @@ rule hisat2_alignment:
        fq1 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[0] + '.trimmed.fastq'),
        fq2 = path.join(PATH_TRIMMED, '{sample}' + PREFIX[1] + '.trimmed.fastq')
     output:
-        PATH_BAM + '{sample}/{sample}.Aligned.out.bam'
+        bam = PATH_BAM + '{sample}.sorted.out.bam'
+        sum = PATH_LOG + '{sample}_sum.txt'
+        met = PATH_LOG + '{sample}_met.txt'
     log:
         PATH_LOG + 'align/{sample}_hisat2.log'
     params:
@@ -215,37 +217,32 @@ rule hisat2_alignment:
         hisat2 \
         --threads {threads} \
         -x {params.index} \
+        --summary-file {output.sum} \
+        --met-file {output.met}
         -1 {input.fq1} \
-        -2 {input.fq2} > {output}
+        -2 {input.fq2} | \
+        samtools sort -T {threads} -o {output.bam}
         """
 #    wrapper:#
 #        "v1.3.2/bio/hisat2/align" # Map PE reads with HISAT2
 
-#rule htseq:
-#    input:
-#        bam = PATH_BAM + '{sample}/Aligned.out.bam'
-#    output:
-#        PATH_HTSEQ + '{sample}.counts.txt'
-#        others = '--stranded=no --mode=intersection-nonempty -r pos',
-#        gtf = PATH_HTSEQ_GTF
-#    shell:
-#        """
-#        htseq-count {params.others} {input.bam} {params.gtf} > {output}
-#        """
+rule featureCounts:
+    input:
+        bam = PATH_BAM + '{sample}/Aligned.out.bam'
+    output:
+        PATH_HTSEQ + '{sample}.counts.txt'
+    params:
+        others = '-p -t exon -g gene_id',
+        gtf = PATH_HTSEQ_GTF
+    shell:
+        """
+        featureCounts {params.others} -a {params.gtf} -o {output} {input.bam}
+        """
+
 rule zip_aligned:
     input: expand(PATH_BAM+'{sample}/Aligned.out.bam', sample=RNAIDs)
     output: PATH_OUT+'bam_zipped.zip'
     shell: "zip -j {output} {input}"
-
-rule filter_bam:
-    input:
-        PATH_BAM+'{sample}/Aligned.out.bam'
-    output:
-        PATH_BAM+'{sample}.mq20.bam'
-    params:
-        config['bam']['params']
-    wrapper:
-        '0.65.0/bio/samtools/view' # convert or filter SAM/BAM;
 
 rule fastqc_fastq:
     input:
