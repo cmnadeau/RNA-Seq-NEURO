@@ -71,7 +71,7 @@ rule all:
 #        PATH_OUT + 'multiqc_raw.html',
         PATH_OUT + 'compress_fastq.zip',
         PATH_OUT + 'compress_bam.zip',
-        PATH_OUT + 'counts_out.zip'
+        PATH_OUT + 'full.counts.txt'
 
 rule zip_fastq:
     input:
@@ -89,15 +89,6 @@ rule zip_bams:
         expand(PATH_BAM + '{sample}.sorted.out.bam', sample=RNAIDs)
     output:
         PATH_OUT + 'compress_bam.zip'
-    shell:
-        """
-        zip -j {output} {input}
-        """
-rule zip_counts:
-    input:
-        expand(PATH_HTSEQ + '{sample}.counts.txt', sample=RNAIDs)
-    output:
-        PATH_OUT + 'counts_out.zip'
     shell:
         """
         zip -j {output} {input}
@@ -229,7 +220,7 @@ rule featureCounts:
     input:
         expand(PATH_BAM + '{sample}.sorted.out.bam', sample=RNAIDs)
     output:
-        PATH_HTSEQ + 'full.counts.txt'
+        PATH_OUT + 'full.counts.txt'
     params:
         others = '-p -t exon -g gene_id',
         gtf = PATH_HTSEQ_GTF
