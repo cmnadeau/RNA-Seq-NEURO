@@ -236,10 +236,10 @@ rule featureCounts:
     log:
         PATH_LOG + 'featurecount.log'
     threads:
-        t = config['ftc']['threads']
+        config['ftc']['threads']
     shell:
         """
-        featureCounts {params.others} -T {threads.t} -a {params.gtf} -o {output} {input} > {log}
+        featureCounts {params.others} -T {threads} -a {params.gtf} -o {output} {input} > {log}
         """
 
 
