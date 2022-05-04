@@ -219,7 +219,7 @@ rule hisat2_alignment:
         --summary-file {output.sum} \
         --met-file {output.met} \
         -1 {input.fq1} \
-        -2 {input.fq2} | \
+        -2 {input.fq2} |\
         samtools sort -T {threads} -o {output.bam}
         """
 #    wrapper:#
@@ -227,15 +227,19 @@ rule hisat2_alignment:
 
 rule featureCounts:
     input:
-        bam = PATH_BAM + '{sample}.sorted.out.bam'
+        expand(PATH_BAM + '{sample}.sorted.out.bam', sample=RNAIDs)
     output:
-        PATH_HTSEQ + '{sample}.counts.txt'
+        PATH_HTSEQ + 'full.counts.txt'
     params:
         others = '-p -t exon -g gene_id',
         gtf = PATH_HTSEQ_GTF
+    log:
+        PATH_LOG + 'featurecount.log'
+    threads:
+        t = config['ftc']['threads']
     shell:
         """
-        featureCounts {params.others} -a {params.gtf} -o {output} {input.bam}
+        featureCounts {params.others} -T {threads.t} -a {params.gtf} -o {output} {input} > {log}
         """
 
 
