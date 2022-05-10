@@ -222,7 +222,7 @@ rule featureCounts:
     output:
         PATH_OUT + 'full.counts.txt'
     params:
-        others = '-p -t exon -g gene_id',
+        others = '-p -t exon -g gene_name',
         gtf = PATH_HTSEQ_GTF
     log:
         PATH_LOG + 'featurecount.log'
